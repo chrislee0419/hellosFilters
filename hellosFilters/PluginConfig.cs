@@ -2,7 +2,7 @@
 using IPA.Config.Stores;
 
 [assembly: InternalsVisibleTo(GeneratedStore.AssemblyVisibilityTarget)]
-namespace hellosFilters
+namespace HUIFilters
 {
     internal class PluginConfig
     {

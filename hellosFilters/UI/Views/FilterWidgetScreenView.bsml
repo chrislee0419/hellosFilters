@@ -1,0 +1,23 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
+    anchor-min-x='0' anchor-min-y='0'
+    anchor-max-x='1' anchor-max-y='1'
+    anchor-pos-x='0' anchor-pos-y='0'
+    id='background'
+    bg='round-rect-panel'>
+  <button id='filter-button'
+               anchor-min-x='0' anchor-min-y='0'
+               anchor-max-x='1' anchor-max-y='1'
+               size-delta-x='-11' size-delta-y='0'
+               anchor-pos-x='-5.5' anchor-pos-y='0'
+               text='Filter'
+               on-click='filter-button-clicked' />
+  <icon-button id='cancel-filter-button'
+               icon='hellosUI:HUI.Assets.cross.png'
+               anchor-min-x='1' anchor-min-y='0'
+               anchor-max-x='1' anchor-max-y='1'
+               pivot-x='1' pivot-y='0.5'
+               size-delta-x='9' size-delta-y='0'
+               anchor-pos-x='-1' anchor-pos-y='0'
+               on-click='cancel-filter-button-clicked' />
+</bg>

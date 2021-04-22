@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using IPA;
+﻿using IPA;
 using IPA.Config;
 using IPA.Config.Stores;
-using UnityEngine;
+using SiraUtil.Zenject;
+using HUIFilters.Installers;
 using IPALogger = IPA.Logging.Logger;
 
-namespace hellosFilters
+namespace HUIFilters
 {
     [Plugin(RuntimeOptions.DynamicInit)]
     public class Plugin
@@ -19,13 +14,14 @@ namespace hellosFilters
         internal static IPALogger Log { get; private set; }
 
         [Init]
-        public Plugin(IPALogger logger, Config conf)
+        public Plugin(IPALogger logger, Config conf, Zenjector zenjector)
         {
             Instance = this;
             Plugin.Log = logger;
-            Plugin.Log?.Debug("Logger initialized.");
 
             PluginConfig.Instance = conf.Generated<PluginConfig>();
+
+            zenjector.OnMenu<FilterInstaller>();
         }
 
 
