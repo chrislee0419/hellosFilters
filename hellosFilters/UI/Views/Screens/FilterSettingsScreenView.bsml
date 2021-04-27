@@ -1,0 +1,128 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
+    anchor-min-x='0' anchor-min-y='0'
+    anchor-max-x='1' anchor-max-y='1'
+    id='background'
+    bg='round-rect-panel'>
+  <!-- top bar -->
+  <bg id='settings-top-bar'
+      anchor-min-x='0' anchor-min-y='1'
+      anchor-max-x='1' anchor-max-y='1'
+      anchor-pos-x='0' anchor-pos-y='-1.5'
+      pivot-x='0.5' pivot-y='1'
+      size-delta-x='-5' size-delta-y='7'>
+    <horizontal bg='round-rect-panel'
+                bg-color='#00000060'
+                anchor-min-x='0' anchor-min-y='0'
+                anchor-max-x='0' anchor-max-y='1'
+                size-delta-x='38' size-delta-y='0'
+                anchor-pos-x='46' anchor-pos-y='0'
+                pivot-x='0' pivot-y='0.5'
+                horizontal-fit='Unconstrained'
+                vertical-fit='Unconstrained'
+                child-expand-height='false'
+                child-align='MiddleLeft'
+                pad-left='2' pad-right='2'
+                spacing='3'>
+      <horizontal min-width='7'
+                  vertical-fit='PreferredSize'
+                  child-align='MiddleLeft'>
+        <text text='STATUS'
+              font-align='Left'
+              font-size='2.6'
+              font-color='#AAAAAA' />
+      </horizontal>
+      <image id='status-image'
+             source='#SmallFullCircle'
+             min-width='3.5'
+             preferred-height='3.5' />
+      <horizontal min-width='20'
+                  preferred-width='30'
+                  vertical-fit='PreferredSize'
+                  child-align='MiddleLeft'>
+        <text text='~filter-status-text'
+              font-size='3'
+              font-align='Left' />
+      </horizontal>
+    </horizontal>
+
+    <icon-button id='close-button'
+                 icon='hellosUI:HUI.Assets.cross.png'
+                 anchor-min-x='1' anchor-min-y='0'
+                 anchor-max-x='1' anchor-max-y='1'
+                 anchor-pos-x='0' anchor-pos-y='0'
+                 pivot-x='1' pivot-y='0.5'
+                 size-delta-x='7' size-delta-y='0'
+                 on-click='close-button-clicked' />
+  </bg>
+
+  <!-- bottom bar -->
+  <bg anchor-min-x='0' anchor-min-y='0'
+      anchor-max-x='1' anchor-max-y='0'
+      anchor-pos-x='0' anchor-pos-y='1.5'
+      pivot-x='0.5' pivot-y='0'
+      size-delta-x='-5' size-delta-y='7'>
+    <button id='apply-button'
+            text='&lt;b&gt;Apply&lt;/b&gt;'
+            font-size='3.4'
+            active='~apply-button-active'
+            interactable='~apply-button-interactable'
+            anchor-min-x='0' anchor-min-y='0'
+            anchor-max-x='0' anchor-max-y='1'
+            anchor-pos-x='0' anchor-pos-y='0'
+            pivot-x='0' pivot-y='0.5'
+            size-delta-x='20' size-delta-y='0'
+            on-click='apply-button-clicked' />
+    <button id='unapply-button'
+            text='&lt;b&gt;Unapply&lt;/b&gt;'
+            font-size='3.4'
+            active='~unapply-button-active'
+            anchor-min-x='0' anchor-min-y='0'
+            anchor-max-x='0' anchor-max-y='1'
+            anchor-pos-x='0' anchor-pos-y='0'
+            pivot-x='0' pivot-y='0.5'
+            size-delta-x='20' size-delta-y='0'
+            on-click='unapply-button-clicked' />
+
+    <button id='save-settings-button'
+            text='Save Settings'
+            font-size='2.8'
+            interactable='~save-settings-button-interactable'
+            anchor-min-x='0' anchor-min-y='0'
+            anchor-max-x='0' anchor-max-y='1'
+            anchor-pos-x='24' anchor-pos-y='0'
+            pivot-x='0' pivot-y='0.5'
+            size-delta-x='20' size-delta-y='0'
+            on-click='save-settings-button-clicked' />
+    
+    <button id='reset-button'
+            text='Reset'
+            font-size='3'
+            interactable='~reset-button-interactable'
+            anchor-min-x='1' anchor-min-y='0'
+            anchor-max-x='1' anchor-max-y='1'
+            anchor-pos-x='-16' anchor-pos-y='0'
+            pivot-x='1' pivot-y='0.5'
+            size-delta-x='14' size-delta-y='0'
+            on-click='reset-button-clicked' />
+    
+    <button id='clear-button'
+            text='Clear'
+            font-size='3'
+            anchor-min-x='1' anchor-min-y='0'
+            anchor-max-x='1' anchor-max-y='1'
+            anchor-pos-x='0' anchor-pos-y='0'
+            pivot-x='1' pivot-y='0.5'
+            size-delta-x='14' size-delta-y='0'
+            on-click='reset-button-clicked' />
+  </bg>
+  
+  <!-- settings container -->
+  <bg id='settings-container'
+      anchor-min-x='0' anchor-min-y='0'
+      anchor-max-x='1' anchor-max-y='1'
+      anchor-pos-x='0' anchor-pos-y='0'
+      size-delta-x='-3' size-delta-y='-16'>
+
+  </bg>
+</bg>

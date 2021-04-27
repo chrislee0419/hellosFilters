@@ -1,5 +1,7 @@
 ﻿using Zenject;
+using HUI.Utilities;
 using HUIFilters.Filters;
+using HUIFilters.Filters.BuiltIn;
 
 namespace HUIFilters.Installers
 {
@@ -8,6 +10,12 @@ namespace HUIFilters.Installers
         public override void InstallBindings()
         {
             Container.BindInterfacesAndSelfTo<FilterManager>().AsSingle();
+
+            Container.Bind<IFilter>().To<DifficultyFilter>().AsSingle();
+
+            var externalFilters = InstallerUtilities.GetAutoInstallDerivativeTypesFromAllAssemblies(typeof(IFilter));
+            foreach (var type in externalFilters)
+                Container.BindInterfacesAndSelfTo(type).AsSingle();
         }
     }
 }

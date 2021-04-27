@@ -17,12 +17,12 @@ using HUIFilters.Filters;
 namespace HUIFilters.UI.Screens
 {
     [AutoInstall]
-    public class FilterSavedSettingsListScreenManager : ModifiableScreenManagerBase
+    public class SavedFilterSettingsListScreenManager : ModifiableScreenManagerBase
     {
         public event Action<int> SavedFilterSettingsApplied;
 
         public override string ScreenName => "Saved Filter Settings List";
-        protected override string AssociatedBSMLResource => "HUIFilters.UI.Views.FilterSavedSettingsListScreenView.bsml";
+        protected override string AssociatedBSMLResource => "HUIFilters.UI.Views.Screens.SavedFilterSettingsListScreenView.bsml";
         protected override bool ShowScreenOnSinglePlayerLevelSelectionStarting => false;
         protected override ScreensSettingsTab.BackgroundOpacity DefaultBGOpacity => ScreensSettingsTab.BackgroundOpacity.Translucent;
 
@@ -42,7 +42,7 @@ namespace HUIFilters.UI.Screens
 
         private static readonly WaitForSeconds ConcealDelaySeconds = new WaitForSeconds(1f);
 
-        public FilterSavedSettingsListScreenManager(
+        public SavedFilterSettingsListScreenManager(
             MainMenuViewController mainMenuVC,
             SoloFreePlayFlowCoordinator soloFC,
             PartyFreePlayFlowCoordinator partyFC,
@@ -106,11 +106,11 @@ namespace HUIFilters.UI.Screens
 
         public void HideScreen() => this._animationHandler.PlayConcealAnimation();
 
-        internal void RefreshSavedFilterSettingsList(IEnumerable<SavedFilter> savedFilterSettings)
+        internal void RefreshSavedFilterSettingsList(IEnumerable<SavedFilterSettings> savedFilterSettings)
         {
             _savedFilterSettingsList.data.Clear();
 
-            foreach (SavedFilter sf in savedFilterSettings)
+            foreach (SavedFilterSettings sf in savedFilterSettings)
                 _savedFilterSettingsList.data.Add(new CustomListTableData.CustomCellInfo(sf.Name.EscapeTextMeshProTags()));
 
             _savedFilterSettingsList.tableView.ReloadData();

@@ -1,0 +1,48 @@
+﻿<scroll-view xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+             xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
+             id='root'
+             anchor-min-x='0' anchor-min-y='0'
+             anchor-max-x='1' anchor-max-y='1'
+             anchor-pos-x='0' anchor-pos-y='0'
+             size-delta-x='0' size-delta-y='0'>
+  <horizontal preferred-width='80'
+              bg='round-rect-panel'
+              bg-color='#00000060'
+              pad='2'>
+    <text text='Remove levels that don&apos;t have a map for the selected difficulties. Setting all difficulties to "Ignore" will disable this filter.'
+          font-size='2.6'
+          word-wrapping='true'
+          italics='true' />
+  </horizontal>
+  
+  <toggle-setting text='Easy'
+                  preferred-width='80'
+                  value='easy-value'
+                  bind-value='true'
+                  apply-on-change='true'
+                  formatter='toggle-formatter' />
+  <toggle-setting text='Normal'
+                  preferred-width='80'
+                  value='normal-value'
+                  bind-value='true'
+                  apply-on-change='true'
+                  formatter='toggle-formatter' />
+  <toggle-setting text='Hard'
+                  preferred-width='80'
+                  value='hard-value'
+                  bind-value='true'
+                  apply-on-change='true'
+                  formatter='toggle-formatter' />
+  <toggle-setting text='Expert'
+                  preferred-width='80'
+                  value='expert-value'
+                  bind-value='true'
+                  apply-on-change='true'
+                  formatter='toggle-formatter' />
+  <toggle-setting text='Expert+'
+                  preferred-width='80'
+                  value='expert-plus-value'
+                  bind-value='true'
+                  apply-on-change='true'
+                  formatter='toggle-formatter' />
+</scroll-view>

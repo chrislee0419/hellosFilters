@@ -10,6 +10,7 @@ using HUI.UI.Components;
 using HUI.UI.Screens;
 using HUI.Utilities;
 using Object = UnityEngine.Object;
+using BSMLUtilities = BeatSaberMarkupLanguage.Utilities;
 
 namespace HUIFilters.UI.Screens
 {
@@ -20,7 +21,7 @@ namespace HUIFilters.UI.Screens
         public event Action CancelFilterButtonPressed;
 
         public override string ScreenName => "Filter Widget";
-        protected override string AssociatedBSMLResource => "HUIFilters.UI.Views.FilterWidgetScreenView.bsml";
+        protected override string AssociatedBSMLResource => "HUIFilters.UI.Views.Screens.FilterWidgetScreenView.bsml";
 
         public bool FilterApplied
         {
@@ -129,6 +130,7 @@ namespace HUIFilters.UI.Screens
             _cancelFilterButtonAnimations.NormalIconColour = Color.white;
             _cancelFilterButtonAnimations.HighlightedBGColour = CancelFilterHighlightedBGColour;
             _cancelFilterButtonAnimations.PressedBGColour = CancelFilterHighlightedBGColour;
+            _cancelFilterButtonAnimations.NormalBGColour = FilterAppliedHighlightedBGColour;
 
             FilterApplied = false;
         }

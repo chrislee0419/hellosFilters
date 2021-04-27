@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 using VRUIControls;
 using HMUI;
+using IPA.Utilities;
 using BeatSaberMarkupLanguage.Attributes;
-using BeatSaberMarkupLanguage.Components;
 using HUI.Attributes;
 using HUI.UI.Components;
 using HUI.UI.Screens;
@@ -20,63 +21,104 @@ namespace HUIFilters.UI.Screens
     public class FilterSettingsScreenManager : ModifiableScreenManagerBase
     {
         public event Action FilterApplied;
+        public event Action FilterUnapplied;
+        public event Action FilterReset;
+        public event Action FilterCleared;
 
         public override string ScreenName => "Filter Settings";
-        protected override string AssociatedBSMLResource => "HUIFilters.UI.Views.FilterSettingsScreenView.bsml";
+        protected override string AssociatedBSMLResource => "HUIFilters.UI.Views.Screens.FilterSettingsScreenView.bsml";
         protected override bool ShowScreenOnSinglePlayerLevelSelectionStarting => false;
         protected override ScreensSettingsTab.BackgroundOpacity DefaultBGOpacity => ScreensSettingsTab.BackgroundOpacity.Translucent;
 
         public bool IsVisible => this._screen.isActiveAndEnabled;
 
-        [UIValue("main-page-active")]
-        public bool MainPageActive { get; set; } = true;
-        [UIValue("settings-page-active")]
-        public bool SettingsPageActive { get; set; } = false;
-        [UIValue("saved-filters-page-active")]
-        public bool SavedFiltersPageActive { get; set; } = false;
+        [UIValue("apply-button-active")]
+        public bool ApplyButtonActive => _hasChanges || !_isApplied;
+        [UIValue("unapply-button-active")]
+        public bool UnapplyButtonActive => !ApplyButtonActive;
+
+        [UIValue("apply-button-interactable")]
+        public bool ApplyButtonInteractable => _hasChanges;
+        [UIValue("save-settings-button-interactable")]
+        public bool SaveSettingsButtonInteractable => _isApplied;
+        [UIValue("reset-button-interactable")]
+        public bool ResetButtonInteractable => _hasChanges;
 
         [UIValue("filter-status-text")]
-        public string FilterStatusText { get; set; } = NotAppliedStatusText;
-        [UIValue("save-settings-button-interactable")]
-        public bool SaveSettingsButtonInteractable { get; set; } = false;
-        [UIValue("edit-saved-settings-button-interactable")]
-        public bool EditSavedSettingsButtonInteractable { get; set; } = false;
+        public string FilterStatusText
+        {
+            get
+            {
+                if (_isApplied)
+                    return _hasChanges ? AppliedWithChangesStatusText : AppliedStatusText;
+                else
+                    return _hasChanges ? NotAppliedWithChangesStatusText : NotAppliedStatusText;
+            }
+        }
+
+        private bool _isApplied = false;
+        private bool IsApplied
+        {
+            get => _isApplied;
+            set
+            {
+                if (_isApplied == value)
+                    return;
+
+                _isApplied = value;
+                UpdateStatusImageColour();
+                NotifyFilterStatusChanged();
+
+            }
+        }
+        private bool _hasChanges = false;
+        private bool HasChanges
+        {
+            get => _hasChanges;
+            set
+            {
+                if (_hasChanges == value)
+                    return;
+
+                _hasChanges = value;
+                UpdateStatusImageColour();
+                NotifyFilterStatusChanged();
+            }
+        }
 
 #pragma warning disable CS0649
-        [UIObject("main-page-buttons-container")]
-        private GameObject _mainPageLayoutContainer;
-        [UIObject("modify-settings-button")]
-        private GameObject _mainModifySettingsButton;
-        [UIObject("save-settings-button")]
-        private GameObject _mainSaveSettingsButton;
-        [UIObject("edit-saved-settings-button")]
-        private GameObject _mainEditSavedSettingsButton;
+        [UIObject("settings-top-bar")]
+        private GameObject _settingsTopBar;
         [UIObject("close-button")]
-        private GameObject _mainCloseButton;
-        [UIObject("main-saved-filters-list-up-button")]
-        private GameObject _mainSavedFiltersListUpButton;
-        [UIObject("main-saved-filters-list-down-button")]
-        private GameObject _mainSavedFiltersListDownButton;
+        private GameObject _closeButton;
 
-        [UIComponent("main-saved-filters-list")]
-        private CustomListTableData _mainSavedFiltersList;
+        [UIComponent("status-image")]
+        private ImageView _statusImage;
 
-        [UIObject("settings-slide-out-container")]
-        private GameObject _settingsSlideOutContainer;
+        [UIObject("apply-button")]
+        private GameObject _applyButton;
+        [UIObject("unapply-button")]
+        private GameObject _unapplyButton;
+        [UIObject("save-settings-button")]
+        private GameObject _saveSettingsButton;
+        [UIObject("reset-button")]
+        private GameObject _resetButton;
+        [UIObject("clear-button")]
+        private GameObject _clearButton;
 
-        [UIComponent("settings-filters-list")]
-        private CustomListTableData _settingsFiltersList;
-
-        [UIComponent("edit-saved-filters-list")]
-        private CustomListTableData _editSavedFiltersList;
+        [UIObject("settings-container")]
+        private GameObject _settingsContainer;
 #pragma warning restore CS0649
 
         private List<IFilter> _filters;
+        private IFilter _currentFilter;
 
-        private const string NotAppliedStatusText = "<color=#FFDDDD>Not applied</color>";
-        private const string NotAppliedWithChangesStatusText = "<color=#FFFFDD>* Not applied</color>";
-        private const string AppliedStatusText = "<color=#DDFFDD>Applied</color>";
-        private const string AppliedWithChangesStatusText = "<color=#DDDDFF>* Applied</color>";
+        private SimpleTextDropdown _filtersDropdown;
+
+        private const string NotAppliedStatusText = "NOT APPLIED";
+        private const string NotAppliedWithChangesStatusText = "<i>NOT APPLIED (*)</i>";
+        private const string AppliedStatusText = "<color=#DDFFDD>APPLIED</color>";
+        private const string AppliedWithChangesStatusText = "<color=#DDDDFF><i>APPLIED (*)</i></color>";
 
         public FilterSettingsScreenManager(
             MainMenuViewController mainMenuVC,
@@ -84,6 +126,8 @@ namespace HUIFilters.UI.Screens
             PartyFreePlayFlowCoordinator partyFC,
             LevelCollectionNavigationController levelCollectionNC,
             PhysicsRaycasterWithCache physicsRaycaster,
+            GameplaySetupViewController gameplaySetupViewController,
+            DiContainer container,
             List<IFilter> filters)
             : base(mainMenuVC, soloFC, partyFC, levelCollectionNC, physicsRaycaster, new Vector2(100f, 60f), new Vector3(0f, 0.15f, 1.5f), Quaternion.Euler(80f, 0f, 0f))
         {
@@ -94,67 +138,115 @@ namespace HUIFilters.UI.Screens
 
             _filters = filters;
 
-            // fix raycaster for BSMLList
-            _mainSavedFiltersList.gameObject.FixRaycaster(physicsRaycaster);
+            // dropdown button
+            var playerSettingsPanelController = FieldAccessor<GameplaySetupViewController, PlayerSettingsPanelController>.Get(ref gameplaySetupViewController, "_playerSettingsPanelController");
+            var noteJumpStartBeatOffsetDropdown = FieldAccessor<PlayerSettingsPanelController, NoteJumpStartBeatOffsetDropdown>.Get(ref playerSettingsPanelController, "_noteJumpStartBeatOffsetDropdown");
+            var dropdownPrefab = FieldAccessor<NoteJumpStartBeatOffsetDropdown, SimpleTextDropdown>.Get(ref noteJumpStartBeatOffsetDropdown, "_simpleTextDropdown");
 
-            // remove underlines
-            GameObject.Destroy(_mainSaveSettingsButton.transform.Find("Underline").gameObject);
-            GameObject.Destroy(_mainEditSavedSettingsButton.transform.Find("Underline").gameObject);
-            GameObject.Destroy(_mainSavedFiltersListUpButton.transform.Find("Underline").gameObject);
-            GameObject.Destroy(_mainSavedFiltersListDownButton.transform.Find("Underline").gameObject);
+            _filtersDropdown = GameObject.Instantiate(dropdownPrefab, _settingsTopBar.transform, false);
+            _filtersDropdown.name = "FiltersDropdown";
 
-            var icon = _mainSavedFiltersListUpButton.transform.Find("Content/Icon").GetComponent<ImageView>();
-            icon.rectTransform.Rotate(0f, 0f, 180f, Space.Self);
+            GameObject.Destroy(_filtersDropdown.GetComponent<NoteJumpStartBeatOffsetDropdown>());
 
-            GameObject.Destroy(_mainSavedFiltersListUpButton.GetComponent<ContentSizeFitter>());
-            GameObject.Destroy(_mainSavedFiltersListDownButton.GetComponent<ContentSizeFitter>());
+            // fix stuff
+            DropdownWithTableView dropdown = _filtersDropdown as DropdownWithTableView;
+            GameObjectUtilities.FixRaycaster(FieldAccessor<DropdownWithTableView, TableView>.Get(ref dropdown, "_tableView").gameObject, physicsRaycaster);
 
-            // remove skew
-            _mainModifySettingsButton.transform.Find("BG").GetComponent<ImageView>().SetSkew(0f);
-            _mainModifySettingsButton.transform.Find("Underline").GetComponent<ImageView>().SetSkew(0f);
-            _mainSaveSettingsButton.transform.Find("BG").GetComponent<ImageView>().SetSkew(0f);
-            _mainEditSavedSettingsButton.transform.Find("BG").GetComponent<ImageView>().SetSkew(0f);
-            _mainCloseButton.transform.Find("BG").GetComponent<ImageView>().SetSkew(0f);
-            _mainCloseButton.transform.Find("Underline").GetComponent<ImageView>().SetSkew(0f);
-            _mainSavedFiltersListUpButton.transform.Find("BG").GetComponent<ImageView>().SetSkew(0f);
-            _mainSavedFiltersListDownButton.transform.Find("BG").GetComponent<ImageView>().SetSkew(0f);
+            ModalView dropdownModalView = dropdown.transform.Find("DropdownTableView").GetComponent<ModalView>();
+            FieldAccessor<ModalView, DiContainer>.Set(ref dropdownModalView, "_container", container);
+
+            var rt = dropdownModalView.transform as RectTransform;
+            rt.anchorMin = new Vector2(rt.anchorMin.x, 1f);
+            rt.anchorMax = new Vector2(rt.anchorMax.x, 1f);
+            rt.pivot = new Vector2(rt.pivot.x, 1f);
+
+            rt = _filtersDropdown.transform as RectTransform;
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = new Vector2(0f, 1f);
+            rt.pivot = new Vector2(0f, 0.5f);
+            rt.anchoredPosition = Vector2.zero;
+            rt.sizeDelta = new Vector2(40f, 0f);
+
+            _filtersDropdown.SetTexts(_filters.Select(x => x.Name).ToList());
+
+            _filtersDropdown.didSelectCellWithIdxEvent += OnFilterDropdownListCellSelected;
+
+            // remove unused stuff from buttons
+            GameObject.Destroy(_closeButton.transform.Find("Underline").gameObject);
+            GameObject.Destroy(_closeButton.GetComponent<ContentSizeFitter>());
+            GameObject.Destroy(_applyButton.GetComponent<ContentSizeFitter>());
+            GameObject.Destroy(_unapplyButton.GetComponent<ContentSizeFitter>());
+            GameObject.Destroy(_saveSettingsButton.GetComponent<ContentSizeFitter>());
+            GameObject.Destroy(_resetButton.GetComponent<ContentSizeFitter>());
+            GameObject.Destroy(_clearButton.GetComponent<ContentSizeFitter>());
+
+            // close button
+            _closeButton.transform.Find("BG").GetComponent<ImageView>().SetSkew(0f);
+            _closeButton.GetComponent<StackLayoutGroup>().padding = new RectOffset(0, 0, 0, 0);
+            _closeButton.transform.Find("Content").GetComponent<StackLayoutGroup>().padding = new RectOffset(2, 2, 0, 0);
 
             // custom animations
-            GameObject.Destroy(_mainSavedFiltersListUpButton.GetComponent<ButtonStaticAnimations>());
-            GameObject.Destroy(_mainSavedFiltersListDownButton.GetComponent<ButtonStaticAnimations>());
+            GameObject.Destroy(_closeButton.GetComponent<ButtonStaticAnimations>());
+            GameObject.Destroy(_applyButton.GetComponent<ButtonStaticAnimations>());
+            GameObject.Destroy(_unapplyButton.GetComponent<ButtonStaticAnimations>());
+            GameObject.Destroy(_resetButton.GetComponent<ButtonStaticAnimations>());
+            GameObject.Destroy(_clearButton.GetComponent<ButtonStaticAnimations>());
 
-            Color highlightedColour = new Color(1f, 0.375f, 0f);
+            var iconBtnAnims = _closeButton.AddComponent<CustomIconButtonAnimations>();
+            iconBtnAnims.HighlightedLocalScale = new Vector3(1.1f, 1.1f, 1.1f);
+            iconBtnAnims.HighlightedBGColour = Color.red;
+            iconBtnAnims.PressedBGColour = Color.red;
 
-            var iconBtnAnims = _mainSavedFiltersListUpButton.gameObject.AddComponent<CustomIconButtonAnimations>();
-            iconBtnAnims.HighlightedBGColour = highlightedColour;
-            iconBtnAnims.PressedBGColour = highlightedColour;
-            iconBtnAnims.HighlightedLocalScale = new Vector3(1.2f, 1.2f, 1.2f);
+            Color applyButtonColour = new Color(0.4f, 1f, 0.133f, 0.75f);
+            var textBtnAnims = _applyButton.AddComponent<CustomTextButtonAnimations>();
+            textBtnAnims.NormalBGColour = applyButtonColour;
+            textBtnAnims.HighlightedBGColour = applyButtonColour;
+            textBtnAnims.PressedBGColour = applyButtonColour;
 
-            iconBtnAnims = _mainSavedFiltersListDownButton.gameObject.AddComponent<CustomIconButtonAnimations>();
-            iconBtnAnims.HighlightedBGColour = highlightedColour;
-            iconBtnAnims.PressedBGColour = highlightedColour;
-            iconBtnAnims.HighlightedLocalScale = new Vector3(1.2f, 1.2f, 1.2f);
+            Color unapplyButtonColour = new Color(0.116f, 0.354f, 0.8f);
+            textBtnAnims = _unapplyButton.AddComponent<CustomTextButtonAnimations>();
+            textBtnAnims.NormalBGColour = unapplyButtonColour;
+            textBtnAnims.HighlightedBGColour = unapplyButtonColour;
+            textBtnAnims.PressedBGColour = unapplyButtonColour;
 
-            // change icon size in buttons by changing the RectOffset
-            var slg = _mainSavedFiltersListUpButton.transform.Find("Content").GetComponent<StackLayoutGroup>();
-            slg.padding = new RectOffset(0, 0, 1, 1);
+            Color resetClearButtonColour = new Color(1f, 0f, 0f, 0.75f);
+            textBtnAnims = _resetButton.AddComponent<CustomTextButtonAnimations>();
+            textBtnAnims.NormalBGColour = resetClearButtonColour;
+            textBtnAnims.HighlightedBGColour = resetClearButtonColour;
+            textBtnAnims.PressedBGColour = resetClearButtonColour;
 
-            slg = _mainSavedFiltersListDownButton.transform.Find("Content").GetComponent<StackLayoutGroup>();
-            slg.padding = new RectOffset(0, 0, 1, 1);
+            textBtnAnims = _clearButton.AddComponent<CustomTextButtonAnimations>();
+            textBtnAnims.NormalBGColour = resetClearButtonColour;
+            textBtnAnims.HighlightedBGColour = resetClearButtonColour;
+            textBtnAnims.PressedBGColour = resetClearButtonColour;
 
-            // test data
-            _mainSavedFiltersList.data.Clear();
-            _mainSavedFiltersList.data.Add(new CustomListTableData.CustomCellInfo("test 1"));
-            _mainSavedFiltersList.data.Add(new CustomListTableData.CustomCellInfo("saved filter test 2"));
-            _mainSavedFiltersList.data.Add(new CustomListTableData.CustomCellInfo("test 3"));
-            _mainSavedFiltersList.data.Add(new CustomListTableData.CustomCellInfo("saved filter 4"));
-            _mainSavedFiltersList.data.Add(new CustomListTableData.CustomCellInfo("test 5"));
-            _mainSavedFiltersList.data.Add(new CustomListTableData.CustomCellInfo("saved filter test 6"));
-            _mainSavedFiltersList.data.Add(new CustomListTableData.CustomCellInfo("test 7"));
-            _mainSavedFiltersList.data.Add(new CustomListTableData.CustomCellInfo("saved filter 8"));
-            _mainSavedFiltersList.data.Add(new CustomListTableData.CustomCellInfo("9"));
-            _mainSavedFiltersList.data.Add(new CustomListTableData.CustomCellInfo("10th test"));
-            _mainSavedFiltersList.tableView.ReloadData();
+            UpdateStatusImageColour();
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            foreach (var filter in _filters)
+                filter.SettingChanged += UpdateFilterStatus;
+
+            _filtersDropdown.SelectCellWithIdx(0);
+            _currentFilter = _filters[0];
+            _currentFilter.ShowView(_settingsContainer);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            if (_filters != null)
+            {
+                foreach (var filter in _filters)
+                {
+                    if (filter != null)
+                        filter.SettingChanged -= UpdateFilterStatus;
+                }
+            }
         }
 
         protected override void OnLevelCollectionNavigationControllerActivated(bool firstActivation, bool addToHierarchy, bool screenSystemEnabling)
@@ -162,63 +254,87 @@ namespace HUIFilters.UI.Screens
             // do not show screen during activation
         }
 
-        public void ShowScreen()
-        {
-            MainPageActive = true;
-            SettingsPageActive = false;
-            SavedFiltersPageActive = false;
-
-            this._animationHandler.PlayRevealAnimation();
-        }
+        public void ShowScreen() => this._animationHandler.PlayRevealAnimation();
 
         public void HideScreen() => this._animationHandler.PlayConcealAnimation();
 
-        private void RefreshSavedFiltersList()
+        private void UpdateStatusImageColour()
         {
-            _mainSavedFiltersList.data.Clear();
-            _editSavedFiltersList.data.Clear();
-
-            // TODO: load saved filters from config
-            List<SavedFilter> savedFilters = new List<SavedFilter>();
-            foreach (var savedFilter in savedFilters)
-            {
-                var cell = new CustomListTableData.CustomCellInfo(savedFilter.Name);
-
-                _mainSavedFiltersList.data.Add(cell);
-                _editSavedFiltersList.data.Add(cell);
-            }
-
-            _mainSavedFiltersList.tableView.ReloadData();
-            _editSavedFiltersList.tableView.ReloadData();
+            if (_isApplied)
+                _statusImage.color = _hasChanges ? new Color(0.6f, 0.6f, 1f) : new Color(0.6f, 1f, 0.6f);
+            else
+                _statusImage.color = _hasChanges ? new Color(1f, 1f, 0.6f) : new Color(0.5f, 0.5f, 0.5f);
         }
 
-        [UIAction("modify-settings-button-clicked")]
-        public void OnModifySettingsButtonClicked()
+        private void NotifyFilterStatusChanged()
         {
-            MainPageActive = false;
-            SettingsPageActive = true;
-            SavedFiltersPageActive = false;
+            this.NotifyPropertyChanged(nameof(ApplyButtonActive));
+            this.NotifyPropertyChanged(nameof(UnapplyButtonActive));
+            this.NotifyPropertyChanged(nameof(SaveSettingsButtonInteractable));
+            this.NotifyPropertyChanged(nameof(ResetButtonInteractable));
+
+            this.NotifyPropertyChanged(nameof(ApplyButtonInteractable));
+
+            this.NotifyPropertyChanged(nameof(FilterStatusText));
         }
 
-        [UIAction("save-settings-button-clicked")]
-        public void OnSaveSettingsButtonClicked()
+        private void UpdateFilterStatus()
         {
-
+            IsApplied = _filters.Any(x => x.IsApplied);
+            HasChanges = _filters.Any(x => x.HasChanges);
         }
 
-        [UIAction("edit-saved-settings-button-clicked")]
-        public void OnEditSavedSettingsButtonClicked()
+        private void OnFilterDropdownListCellSelected(DropdownWithTableView dropdown, int index)
         {
+            Plugin.Log.DebugOnly($"Filter at index {index} selected ({_filters[index].Name})");
 
+            if (_currentFilter == _filters[index])
+                return;
+
+            _currentFilter.HideView();
+            _currentFilter = _filters[index];
+            _currentFilter.ShowView(_settingsContainer);
         }
 
         [UIAction("close-button-clicked")]
-        public void OnCloseButtonClicked() => HideScreen();
+        private void OnCloseButtonClicked() => HideScreen();
 
-        [UIAction("main-saved-filters-cell-selected")]
-        public void OnMainSavedFiltersListCellSelected(TableView tableView, int index)
+        [UIAction("apply-button-clicked")]
+        private void OnApplyButtonClicked()
         {
+            this.CallAndHandleAction(FilterApplied, nameof(FilterApplied));
 
+            UpdateFilterStatus();
+        }
+
+        [UIAction("unapply-button-clicked")]
+        private void OnUnapplyButtonClicked()
+        {
+            this.CallAndHandleAction(FilterUnapplied, nameof(FilterUnapplied));
+
+            UpdateFilterStatus();
+        }
+
+        [UIAction("save-settings-button-clicked")]
+        private void OnSaveSettingsButtonClicked()
+        {
+            Plugin.Log.Notice("save settings button clicked");
+        }
+
+        [UIAction("reset-button-clicked")]
+        private void OnResetButtonClicked()
+        {
+            this.CallAndHandleAction(FilterReset, nameof(FilterReset));
+
+            UpdateFilterStatus();
+        }
+
+        [UIAction("clear-button-clicked")]
+        private void OnClearButtonClicked()
+        {
+            this.CallAndHandleAction(FilterCleared, nameof(FilterCleared));
+
+            UpdateFilterStatus();
         }
     }
 }
