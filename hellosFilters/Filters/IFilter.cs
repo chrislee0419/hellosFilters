@@ -1,6 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
@@ -32,9 +34,10 @@ namespace HUIFilters.Filters
         IDictionary<string, string> GetAppliedSettings();
     }
 
-    public abstract class BSMLViewFilterBase : IFilter
+    public abstract class BSMLViewFilterBase : IFilter, INotifyPropertyChanged
     {
         public event Action SettingChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public abstract string Name { get; }
         public virtual bool IsAvailable => true;
@@ -48,6 +51,8 @@ namespace HUIFilters.Filters
         protected GameObject _viewGO;
 
         protected void InvokeSettingChanged() => this.CallAndHandleAction(SettingChanged, nameof(SettingChanged));
+
+        protected void InvokePropertyChanged([CallerMemberName] string propertyName = null) => this.CallAndHandleAction(PropertyChanged, propertyName);
 
         public virtual void ShowView(GameObject parentGO)
         {

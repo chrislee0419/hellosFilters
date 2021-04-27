@@ -302,6 +302,8 @@ namespace HUIFilters.UI.Screens
         [UIAction("apply-button-clicked")]
         private void OnApplyButtonClicked()
         {
+            Plugin.Log.DebugOnly("Apply filters button clicked");
+
             this.CallAndHandleAction(FilterApplied, nameof(FilterApplied));
 
             UpdateFilterStatus();
@@ -310,6 +312,8 @@ namespace HUIFilters.UI.Screens
         [UIAction("unapply-button-clicked")]
         private void OnUnapplyButtonClicked()
         {
+            Plugin.Log.DebugOnly("Unapply filters button clicked");
+
             this.CallAndHandleAction(FilterUnapplied, nameof(FilterUnapplied));
 
             UpdateFilterStatus();
@@ -324,6 +328,8 @@ namespace HUIFilters.UI.Screens
         [UIAction("reset-button-clicked")]
         private void OnResetButtonClicked()
         {
+            Plugin.Log.DebugOnly("Reset filters button clicked");
+
             this.CallAndHandleAction(FilterReset, nameof(FilterReset));
 
             UpdateFilterStatus();
@@ -332,6 +338,8 @@ namespace HUIFilters.UI.Screens
         [UIAction("clear-button-clicked")]
         private void OnClearButtonClicked()
         {
+            Plugin.Log.DebugOnly("Clear filters button clicked");
+
             this.CallAndHandleAction(FilterCleared, nameof(FilterCleared));
 
             UpdateFilterStatus();

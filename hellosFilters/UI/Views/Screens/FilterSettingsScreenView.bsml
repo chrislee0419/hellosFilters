@@ -114,7 +114,7 @@
             anchor-pos-x='0' anchor-pos-y='0'
             pivot-x='1' pivot-y='0.5'
             size-delta-x='14' size-delta-y='0'
-            on-click='reset-button-clicked' />
+            on-click='clear-button-clicked' />
   </bg>
   
   <!-- settings container -->

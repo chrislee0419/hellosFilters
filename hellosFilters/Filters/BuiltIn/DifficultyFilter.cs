@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using BeatSaberMarkupLanguage.Attributes;
-using HUI.Utilities;
 
 namespace HUIFilters.Filters.BuiltIn
 {
@@ -35,7 +33,11 @@ namespace HUIFilters.Filters.BuiltIn
                     return;
 
                 _easyStagingValue = value;
-                InvokeSettingChanged();
+
+                if (_settingMultipleStagingValues)
+                    InvokePropertyChanged();
+                else
+                    InvokeSettingChanged();
             }
         }
         private bool _normalStagingValue = false;
@@ -49,7 +51,11 @@ namespace HUIFilters.Filters.BuiltIn
                     return;
 
                 _normalStagingValue = value;
-                InvokeSettingChanged();
+
+                if (_settingMultipleStagingValues)
+                    InvokePropertyChanged();
+                else
+                    InvokeSettingChanged();
             }
         }
         private bool _hardStagingValue = false;
@@ -63,7 +69,11 @@ namespace HUIFilters.Filters.BuiltIn
                     return;
 
                 _hardStagingValue = value;
-                InvokeSettingChanged();
+
+                if (_settingMultipleStagingValues)
+                    InvokePropertyChanged();
+                else
+                    InvokeSettingChanged();
             }
         }
         private bool _expertStagingValue = false;
@@ -77,7 +87,11 @@ namespace HUIFilters.Filters.BuiltIn
                     return;
 
                 _expertStagingValue = value;
-                InvokeSettingChanged();
+
+                if (_settingMultipleStagingValues)
+                    InvokePropertyChanged();
+                else
+                    InvokeSettingChanged();
             }
         }
         private bool _expertPlusStagingValue = false;
@@ -91,7 +105,11 @@ namespace HUIFilters.Filters.BuiltIn
                     return;
 
                 _expertPlusStagingValue = value;
-                InvokeSettingChanged();
+
+                if (_settingMultipleStagingValues)
+                    InvokePropertyChanged();
+                else
+                    InvokeSettingChanged();
             }
         }
 
@@ -103,6 +121,8 @@ namespace HUIFilters.Filters.BuiltIn
         private bool _expertAppliedValue = false;
         private bool _expertPlusAppliedValue = false;
 
+        private bool _settingMultipleStagingValues = false;
+
         private const string EasySettingName = "easy";
         private const string NormalSettingName = "normal";
         private const string HardSettingName = "hard";
@@ -111,20 +131,28 @@ namespace HUIFilters.Filters.BuiltIn
 
         public override void SetDefaultValuesToStaging()
         {
+            _settingMultipleStagingValues = true;
+
             EasyStagingValue = false;
             NormalStagingValue = false;
             HardStagingValue = false;
             ExpertStagingValue = false;
             ExpertPlusStagingValue = false;
+
+            _settingMultipleStagingValues = false;
         }
 
         public override void SetAppliedValuesToStaging()
         {
+            _settingMultipleStagingValues = true;
+
             EasyStagingValue = _easyAppliedValue;
             NormalStagingValue = _normalAppliedValue;
             HardStagingValue = _hardAppliedValue;
             ExpertStagingValue = _expertAppliedValue;
             ExpertPlusStagingValue = _expertPlusAppliedValue;
+
+            _settingMultipleStagingValues = false;
         }
 
         public override void SetSavedValuesToStaging(IReadOnlyDictionary<string, string> settings)
@@ -183,11 +211,11 @@ namespace HUIFilters.Filters.BuiltIn
             for (int i = 0; i < levels.Count; ++i)
             {
                 var diffs = levels[i].previewDifficultyBeatmapSets.SelectMany(x => x.beatmapDifficulties).ToHashSet();
-                if ((_easyAppliedValue && diffs.Contains(BeatmapDifficulty.Easy)) ||
-                    (_normalAppliedValue && diffs.Contains(BeatmapDifficulty.Normal)) ||
-                    (_hardAppliedValue && diffs.Contains(BeatmapDifficulty.Hard)) ||
-                    (_expertAppliedValue && diffs.Contains(BeatmapDifficulty.Expert)) ||
-                    (_expertPlusAppliedValue && diffs.Contains(BeatmapDifficulty.ExpertPlus)))
+                if ((_easyAppliedValue && !diffs.Contains(BeatmapDifficulty.Easy)) ||
+                    (_normalAppliedValue && !diffs.Contains(BeatmapDifficulty.Normal)) ||
+                    (_hardAppliedValue && !diffs.Contains(BeatmapDifficulty.Hard)) ||
+                    (_expertAppliedValue && !diffs.Contains(BeatmapDifficulty.Expert)) ||
+                    (_expertPlusAppliedValue && !diffs.Contains(BeatmapDifficulty.ExpertPlus)))
                 {
                     levels.RemoveAt(i--);
                 }
@@ -205,8 +233,5 @@ namespace HUIFilters.Filters.BuiltIn
                 { ExpertPlusSettingName, _expertPlusAppliedValue.ToString() }
             };
         }
-
-        [UIAction("toggle-formatter")]
-        private string FormatToggleValue(object value) => (bool)value ? "Require" : "Ignore";
     }
 }
