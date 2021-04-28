@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using Zenject;
 using HUI.Interfaces;
 using HUI.Utilities;
@@ -70,16 +71,29 @@ namespace HUIFilters.Filters
         {
             if (!_filters.Any(x => x.IsApplied))
             {
+                Plugin.Log.DebugOnly($"No modifications done to the level collection by {nameof(FilterManager)} (no filters are applied)");
+
                 modifiedLevelCollection = levelCollection;
                 return false;
             }
 
             List<IPreviewBeatmapLevel> levels = levelCollection.ToList();
+
+#if DEBUG
+            Stopwatch sw = Stopwatch.StartNew();
+            int levelCount = levels.Count;
+#endif
+
             foreach (var filter in _filters)
             {
                 if (filter.IsApplied)
                     filter.FilterLevels(ref levels);
             }
+
+#if DEBUG
+            sw.Stop();
+            Plugin.Log.Notice($"Filters applied in {sw.ElapsedMilliseconds}ms (kept {levels.Count} out of {levelCount} levels)");
+#endif
 
             modifiedLevelCollection = levels;
             return true;
