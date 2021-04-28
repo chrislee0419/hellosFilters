@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Filters\BuiltIn\DifficultyFilter.cs" />
+    <Compile Include="Filters\BuiltIn\DurationFilter.cs" />
     <Compile Include="Filters\FilterManager.cs" />
     <Compile Include="Filters\IFilter.cs" />
     <Compile Include="Filters\SavedFilterSettings.cs" />
@@ -163,6 +164,7 @@
     <EmbeddedResource Include="UI\Views\Screens\FilterSettingsScreenView.bsml" />
     <EmbeddedResource Include="UI\Views\Screens\SavedFilterSettingsListScreenView.bsml" />
     <EmbeddedResource Include="UI\Views\Filters\DifficultyFilterView.bsml" />
+    <EmbeddedResource Include="UI\Views\Filters\DurationFilterView.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">

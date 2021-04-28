@@ -12,6 +12,7 @@ namespace HUIFilters.Installers
             Container.BindInterfacesAndSelfTo<FilterManager>().AsSingle();
 
             Container.Bind<IFilter>().To<DifficultyFilter>().AsSingle();
+            Container.Bind<IFilter>().To<DurationFilter>().AsSingle();
 
             var externalFilters = InstallerUtilities.GetAutoInstallDerivativeTypesFromAllAssemblies(typeof(IFilter));
             foreach (var type in externalFilters)
