@@ -34,10 +34,13 @@ namespace HUIFilters.Filters
         IDictionary<string, string> GetAppliedSettings();
     }
 
-    public abstract class BSMLViewFilterBase : IFilter, INotifyPropertyChanged
+    /// <summary>
+    /// An incomplete implementation of <see cref="IFilter"/>
+    /// that uses a BSML file to represent the view.
+    /// </summary>
+    public abstract class BSMLViewFilterBase : IFilter
     {
         public event Action SettingChanged;
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public abstract string Name { get; }
         public virtual bool IsAvailable => true;
@@ -51,8 +54,6 @@ namespace HUIFilters.Filters
         protected GameObject _viewGO;
 
         protected void InvokeSettingChanged() => this.CallAndHandleAction(SettingChanged, nameof(SettingChanged));
-
-        protected void InvokePropertyChanged([CallerMemberName] string propertyName = null) => this.CallAndHandleAction(PropertyChanged, propertyName);
 
         public virtual void ShowView(GameObject parentGO)
         {
@@ -71,17 +72,89 @@ namespace HUIFilters.Filters
         public virtual void HideView() => _viewGO?.SetActive(false);
 
         public abstract void SetDefaultValuesToStaging();
-
         public abstract void SetAppliedValuesToStaging();
-
         public abstract void SetSavedValuesToStaging(IReadOnlyDictionary<string, string> settings);
 
         public abstract void ApplyStagingValues();
-
         public abstract void ApplyDefaultValues();
 
         public abstract void FilterLevels(ref List<IPreviewBeatmapLevel> levels);
 
         public abstract IDictionary<string, string> GetAppliedSettings();
+    }
+
+    /// <summary>
+    /// A version of <see cref="BSMLViewFilterBase"/> that implements <see cref="INotifyPropertyChanged"/>.
+    /// 
+    /// <para>
+    /// Make sure to override the <see cref="InternalSetDefaultValuesToStaging"/> and
+    /// <see cref="InternalSetAppliedValuesToStaging"/> functions instead of the
+    /// <see cref="SetDefaultValuesToStaging"/> and <see cref="SetAppliedValuesToStaging"/>.
+    /// </para>
+    /// </summary>
+    public abstract class NotifiableBSMLViewFilterBase : BSMLViewFilterBase, INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private bool _isStagingValuesFromUI = true;
+
+        protected void InvokePropertyChanged([CallerMemberName] string propertyName = null) => this.CallAndHandleAction(PropertyChanged, propertyName);
+
+        /// <summary>
+        /// Use this function in the setter of each property that your BSML view will use to 
+        /// trigger the PropertyChanged event or SettingChanged event.
+        /// 
+        /// <para>
+        /// This function will ensure values changed in the UI by the user will not fire the
+        /// <see cref="PropertyChanged"/> event (and force BSML to unnecessarily get the value)
+        /// and values changed in code will not fire the <see cref="BSMLViewFilterBase.SettingChanged"/> event
+        /// (so HUI doesn't have to deal with this event when the user resets or clears all filters).
+        /// </para>
+        /// 
+        /// <para>
+        /// Make sure to override the <see cref="InternalSetDefaultValuesToStaging"/> and
+        /// <see cref="InternalSetAppliedValuesToStaging"/> functions instead of the
+        /// <see cref="SetDefaultValuesToStaging"/> and <see cref="SetAppliedValuesToStaging"/>.
+        /// </para>
+        /// </summary>
+        /// <param name="propertyName">The name of the property that has been changed.</param>
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            if (_isStagingValuesFromUI)
+                InvokeSettingChanged();
+            else
+                InvokePropertyChanged(propertyName);
+        }
+
+        public override void SetDefaultValuesToStaging()
+        {
+            _isStagingValuesFromUI = false;
+
+            InternalSetDefaultValuesToStaging();
+
+            _isStagingValuesFromUI = true;
+        }
+
+        public override void SetAppliedValuesToStaging()
+        {
+            _isStagingValuesFromUI = false;
+
+            InternalSetAppliedValuesToStaging();
+
+            _isStagingValuesFromUI = true;
+        }
+
+        public override void SetSavedValuesToStaging(IReadOnlyDictionary<string, string> settings)
+        {
+            _isStagingValuesFromUI = false;
+
+            InternalSetSavedValuesToStaging(settings);
+
+            _isStagingValuesFromUI = true;
+        }
+
+        protected abstract void InternalSetDefaultValuesToStaging();
+        protected abstract void InternalSetAppliedValuesToStaging();
+        protected abstract void InternalSetSavedValuesToStaging(IReadOnlyDictionary<string, string> settings);
     }
 }

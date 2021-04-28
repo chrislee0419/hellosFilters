@@ -4,7 +4,7 @@ using BeatSaberMarkupLanguage.Attributes;
 
 namespace HUIFilters.Filters.BuiltIn
 {
-    internal class DifficultyFilter : BSMLViewFilterBase
+    internal class DifficultyFilter : NotifiableBSMLViewFilterBase
     {
         public override string Name => "Difficulty";
         public override bool IsAvailable => true;
@@ -33,11 +33,7 @@ namespace HUIFilters.Filters.BuiltIn
                     return;
 
                 _easyStagingValue = value;
-
-                if (_settingMultipleStagingValues)
-                    InvokePropertyChanged();
-                else
-                    InvokeSettingChanged();
+                OnPropertyChanged();
             }
         }
         private bool _normalStagingValue = false;
@@ -51,11 +47,7 @@ namespace HUIFilters.Filters.BuiltIn
                     return;
 
                 _normalStagingValue = value;
-
-                if (_settingMultipleStagingValues)
-                    InvokePropertyChanged();
-                else
-                    InvokeSettingChanged();
+                OnPropertyChanged();
             }
         }
         private bool _hardStagingValue = false;
@@ -69,11 +61,7 @@ namespace HUIFilters.Filters.BuiltIn
                     return;
 
                 _hardStagingValue = value;
-
-                if (_settingMultipleStagingValues)
-                    InvokePropertyChanged();
-                else
-                    InvokeSettingChanged();
+                OnPropertyChanged();
             }
         }
         private bool _expertStagingValue = false;
@@ -87,11 +75,7 @@ namespace HUIFilters.Filters.BuiltIn
                     return;
 
                 _expertStagingValue = value;
-
-                if (_settingMultipleStagingValues)
-                    InvokePropertyChanged();
-                else
-                    InvokeSettingChanged();
+                OnPropertyChanged();
             }
         }
         private bool _expertPlusStagingValue = false;
@@ -105,11 +89,7 @@ namespace HUIFilters.Filters.BuiltIn
                     return;
 
                 _expertPlusStagingValue = value;
-
-                if (_settingMultipleStagingValues)
-                    InvokePropertyChanged();
-                else
-                    InvokeSettingChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -121,66 +101,56 @@ namespace HUIFilters.Filters.BuiltIn
         private bool _expertAppliedValue = false;
         private bool _expertPlusAppliedValue = false;
 
-        private bool _settingMultipleStagingValues = false;
-
         private const string EasySettingName = "easy";
         private const string NormalSettingName = "normal";
         private const string HardSettingName = "hard";
         private const string ExpertSettingName = "expert";
         private const string ExpertPlusSettingName = "expertplus";
 
-        public override void SetDefaultValuesToStaging()
+        protected override void InternalSetDefaultValuesToStaging()
         {
-            _settingMultipleStagingValues = true;
-
             EasyStagingValue = false;
             NormalStagingValue = false;
             HardStagingValue = false;
             ExpertStagingValue = false;
             ExpertPlusStagingValue = false;
-
-            _settingMultipleStagingValues = false;
         }
 
-        public override void SetAppliedValuesToStaging()
+        protected override void InternalSetAppliedValuesToStaging()
         {
-            _settingMultipleStagingValues = true;
-
             EasyStagingValue = _easyAppliedValue;
             NormalStagingValue = _normalAppliedValue;
             HardStagingValue = _hardAppliedValue;
             ExpertStagingValue = _expertAppliedValue;
             ExpertPlusStagingValue = _expertPlusAppliedValue;
-
-            _settingMultipleStagingValues = false;
         }
 
-        public override void SetSavedValuesToStaging(IReadOnlyDictionary<string, string> settings)
+        protected override void InternalSetSavedValuesToStaging(IReadOnlyDictionary<string, string> settings)
         {
             int errorCount = 0;
 
             if (settings.TryGetValue(EasySettingName, out string value) && bool.TryParse(value, out bool boolValue))
-                _easyStagingValue = boolValue;
+                EasyStagingValue = boolValue;
             else
                 Plugin.Log.Debug($"Unable to load '{EasySettingName}' value for Difficulty filter ({++errorCount})");
 
             if (settings.TryGetValue(NormalSettingName, out value) && bool.TryParse(value, out boolValue))
-                _normalStagingValue = boolValue;
+                NormalStagingValue = boolValue;
             else
                 Plugin.Log.Debug($"Unable to load '{NormalSettingName}' value for Difficulty filter ({++errorCount})");
 
             if (settings.TryGetValue(HardSettingName, out value) && bool.TryParse(value, out boolValue))
-                _hardStagingValue = boolValue;
+                HardStagingValue = boolValue;
             else
                 Plugin.Log.Debug($"Unable to load '{HardSettingName}' value for Difficulty filter ({++errorCount})");
 
             if (settings.TryGetValue(ExpertSettingName, out value) && bool.TryParse(value, out boolValue))
-                _expertStagingValue = boolValue;
+                ExpertStagingValue = boolValue;
             else
                 Plugin.Log.Debug($"Unable to load '{ExpertSettingName}' value for Difficulty filter ({++errorCount})");
 
             if (settings.TryGetValue(ExpertPlusSettingName, out value) && bool.TryParse(value, out boolValue))
-                _expertPlusStagingValue = boolValue;
+                ExpertPlusStagingValue = boolValue;
             else
                 Plugin.Log.Debug($"Unable to load '{ExpertPlusSettingName}' value for Difficulty filter ({++errorCount})");
 
