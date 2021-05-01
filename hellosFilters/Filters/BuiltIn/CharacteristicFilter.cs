@@ -117,18 +117,20 @@ namespace HUIFilters.Filters.BuiltIn
 
         private IDataSource _dataSource;
 
+        private HashSet<string> _allCharacteristics = null;
+
         private const string OneSaberSettingName = "oneSaber";
         private const string NoArrowsSettingName = "noArrows";
         private const string Mode90DegreeSettingName = "90";
         private const string Mode360DegreeSettingName = "360";
         private const string LightshowSettingName = "lightshow";
 
-        private const string OneSaberSerializedName = "OneSaber";
-        private const string NoArrowsSerializedName = "NoArrows";
-        private const string Mode90DegreeSerializedName = "90Degree";
-        private const string Mode360DegreeSerializedName = "360Degree";
-        private const string LightshowSerializedName = "Lightshow";
-        private const string MissingCustomCharacteristicSerializedName = "MissingCharacteristic";
+        public const string OneSaberSerializedName = "OneSaber";
+        public const string NoArrowsSerializedName = "NoArrows";
+        public const string Mode90DegreeSerializedName = "90Degree";
+        public const string Mode360DegreeSerializedName = "360Degree";
+        public const string LightshowSerializedName = "Lightshow";
+        public const string MissingCustomCharacteristicSerializedName = "MissingCharacteristic";
 
         [Inject]
         public CharacteristicFilter(IDataSource dataSource)
@@ -286,6 +288,57 @@ namespace HUIFilters.Filters.BuiltIn
                 settings.Add(customCharacteristic.CharacteristicSerializedName, customCharacteristic.RequiredAppliedValue.ToString());
 
             return settings;
+        }
+
+        /// <summary>
+        /// Get the serialized names of all characteristics that are applied or all possible characteristics 
+        /// if this filter is not applied.
+        /// </summary>
+        /// <returns>A <see cref="HashSet{string}"/> containing the serialized names of characteristics that pass the filter.</returns>
+        public HashSet<string> GetSerializedNamesOfAppliedCharacteristics()
+        {
+            if (!this.IsApplied)
+            {
+                if (_allCharacteristics == null)
+                {
+                    _allCharacteristics = new HashSet<string>(5 + CustomCharacteristics.Length);
+
+                    _allCharacteristics.Add(OneSaberSerializedName);
+                    _allCharacteristics.Add(NoArrowsSerializedName);
+                    _allCharacteristics.Add(Mode90DegreeSerializedName);
+                    _allCharacteristics.Add(Mode360DegreeSerializedName);
+                    _allCharacteristics.Add(LightshowSerializedName);
+
+                    foreach (var customCharacteristic in CustomCharacteristics)
+                        _allCharacteristics.Add(customCharacteristic.CharacteristicSerializedName);
+                }
+
+                return _allCharacteristics;
+            }
+
+            HashSet<string> characteristics = new HashSet<string>();
+            if (OneSaberAppliedValue)
+                characteristics.Add(OneSaberSerializedName);
+
+            if (NoArrowsAppliedValue)
+                characteristics.Add(NoArrowsSerializedName);
+
+            if (Mode90DegreeAppliedValue)
+                characteristics.Add(Mode90DegreeSerializedName);
+
+            if (Mode360DegreeAppliedValue)
+                characteristics.Add(Mode360DegreeSerializedName);
+
+            if (LightshowAppliedValue)
+                characteristics.Add(LightshowSerializedName);
+
+            foreach (var customCharacteristic in CustomCharacteristics)
+            {
+                if (customCharacteristic.RequiredAppliedValue)
+                    characteristics.Add(customCharacteristic.CharacteristicSerializedName);
+            }
+
+            return characteristics;
         }
 
         private bool LightshowExistsForLevel(IPreviewBeatmapLevel level)

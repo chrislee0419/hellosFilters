@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BeatSaberMarkupLanguage.Attributes;
 
@@ -100,6 +101,8 @@ namespace HUIFilters.Filters.BuiltIn
         public bool ExpertPlusAppliedValue { get; private set; } = false;
 
         protected override string AssociatedBSMLFile => "HUIFilters.UI.Views.Filters.DifficultyFilterView.bsml";
+
+        private HashSet<BeatmapDifficulty> _allDifficulties = null;
 
         private const string EasySettingName = "easy";
         private const string NormalSettingName = "normal";
@@ -206,6 +209,36 @@ namespace HUIFilters.Filters.BuiltIn
                 { ExpertSettingName, ExpertAppliedValue.ToString() },
                 { ExpertPlusSettingName, ExpertPlusAppliedValue.ToString() }
             };
+        }
+
+        /// <summary>
+        /// Get the difficulties that are applied or all difficulties if this filter is not applied.
+        /// </summary>
+        /// <returns>A <see cref="HashSet{BeatmapDifficulty}"/> containing difficulties that pass the filter.</returns>
+        public HashSet<BeatmapDifficulty> GetAppliedDifficulties()
+        {
+            if (!this.IsApplied)
+            {
+                if (_allDifficulties == null)
+                    _allDifficulties = new HashSet<BeatmapDifficulty>(Enum.GetValues(typeof(BeatmapDifficulty)).Cast<BeatmapDifficulty>());
+
+                return _allDifficulties;
+            }
+
+            HashSet<BeatmapDifficulty> difficulties = new HashSet<BeatmapDifficulty>();
+
+            if (EasyAppliedValue)
+                difficulties.Add(BeatmapDifficulty.Easy);
+            if (NormalAppliedValue)
+                difficulties.Add(BeatmapDifficulty.Normal);
+            if (HardAppliedValue)
+                difficulties.Add(BeatmapDifficulty.Hard);
+            if (ExpertAppliedValue)
+                difficulties.Add(BeatmapDifficulty.Expert);
+            if (ExpertPlusAppliedValue)
+                difficulties.Add(BeatmapDifficulty.ExpertPlus);
+
+            return difficulties;
         }
     }
 }
