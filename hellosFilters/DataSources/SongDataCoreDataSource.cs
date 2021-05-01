@@ -73,7 +73,7 @@ namespace HUIFilters.DataSources
                 SDCPlugin.Songs.OnDataFinishedProcessing += OnSongDataCoreFinishedProcessing;
 
                 if (SDCPlugin.Songs.IsDataAvailable())
-                    ProcessData();
+                    await ProcessData();
             });
         }
 
@@ -106,21 +106,29 @@ namespace HUIFilters.DataSources
                     await Task.Delay(1000);
 
                 if (SDCPlugin.Songs.IsDataAvailable())
-                    ProcessData();
+                    await ProcessData();
                 else
                     Plugin.Log.Error("Unable to process data from SongDataCore (data is not available)");
             });
         }
 
-        private void ProcessData()
+        private async Task ProcessData()
         {
             Plugin.Log.Info("Processing data from SongDataCore");
             Stopwatch sw = Stopwatch.StartNew();
 
-            foreach (var song in SDCPlugin.Songs.Data.Songs.Values)
+            const int WorkLimit = 100;
+            int limit = WorkLimit;
+            foreach (var (hash, song) in SDCPlugin.Songs.Data.Songs)
             {
                 Dictionary<string, List<BeatmapMetaData.DifficultyData>> beatmapCharacteristics = new Dictionary<string, List<BeatmapMetaData.DifficultyData>>();
                 Dictionary<string, List<ScoreSaberData.DifficultyData>> scoreSabercharacteristics = new Dictionary<string, List<ScoreSaberData.DifficultyData>>();
+
+                if ((--limit) < 0)
+                {
+                    await Task.Yield();
+                    limit = WorkLimit;
+                }
 
                 foreach (var (characteristic, difficultiesData) in song.characteristics)
                 {
