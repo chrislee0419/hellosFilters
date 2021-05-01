@@ -67,6 +67,8 @@ namespace HUIFilters.Filters
             }
 
             BSMLParser.instance.Parse(Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), AssociatedBSMLFile), parentGO, this);
+
+            _viewGO.name = $"{this.GetType().Name}View";
         }
 
         public virtual void HideView() => _viewGO?.SetActive(false);
