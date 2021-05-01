@@ -125,6 +125,7 @@ namespace HUIFilters.Filters.BuiltIn
         private const string Mode360DegreeSettingName = "360";
         private const string LightshowSettingName = "lightshow";
 
+        public const string StandardSerializedName = "Standard";
         public const string OneSaberSerializedName = "OneSaber";
         public const string NoArrowsSerializedName = "NoArrows";
         public const string Mode90DegreeSerializedName = "90Degree";
@@ -301,8 +302,9 @@ namespace HUIFilters.Filters.BuiltIn
             {
                 if (_allCharacteristics == null)
                 {
-                    _allCharacteristics = new HashSet<string>(5 + CustomCharacteristics.Length);
+                    _allCharacteristics = new HashSet<string>(6 + CustomCharacteristics.Length);
 
+                    _allCharacteristics.Add(StandardSerializedName);
                     _allCharacteristics.Add(OneSaberSerializedName);
                     _allCharacteristics.Add(NoArrowsSerializedName);
                     _allCharacteristics.Add(Mode90DegreeSerializedName);
