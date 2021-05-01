@@ -146,9 +146,9 @@ namespace HUIFilters.DataSources
                     scoreSabercharacteristics.Add(characteristicSerializedName, scoreSaberDifficulties);
                 }
 
-                _beatmapData.Add(song.key, new BeatmapMetaData(beatmapCharacteristics, song.bpm));
-                _scoreSaberData.Add(song.key, new ScoreSaberData(scoreSabercharacteristics));
-                _beatSaverData.Add(song.key, new BeatSaverData(song.downloadCount, song.upVotes, song.downVotes, song.heat, song.rating));
+                _beatmapData.Add(hash, new BeatmapMetaData(beatmapCharacteristics, song.bpm));
+                _scoreSaberData.Add(hash, new ScoreSaberData(scoreSabercharacteristics));
+                _beatSaverData.Add(hash, new BeatSaverData(song.downloadCount, song.upVotes, song.downVotes, song.heat, song.rating));
             }
 
             sw.Stop();
