@@ -21,12 +21,12 @@ namespace HUIFilters.Installers
         {
             SongDataCoreDataSource sdcDataSource = null;
 
-            if (!Container.HasBinding<IDataSource>())
+            if (!Container.HasBinding<IBeatmapDataSource>())
             {
                 Plugin.Log.Info("Installing SongDataCoreDataSource to IDataSource");
                 sdcDataSource = CreateSongDataCoreDataSourceInstance();
 
-                Container.Bind<IDataSource>().To<SongDataCoreDataSource>().FromInstance(sdcDataSource);
+                Container.Bind<IBeatmapDataSource>().To<SongDataCoreDataSource>().FromInstance(sdcDataSource);
             }
 
             if (!Container.HasBinding<IScoreSaberDataSource>())
@@ -62,10 +62,10 @@ namespace HUIFilters.Installers
         {
             var emptyDataSource = new EmptyDataSource();
 
-            if (!Container.HasBinding<IDataSource>())
+            if (!Container.HasBinding<IBeatmapDataSource>())
             {
                 Plugin.Log.Info("Installing EmptyDataSource to IDataSource");
-                Container.Bind<IDataSource>().To<EmptyDataSource>().FromInstance(emptyDataSource);
+                Container.Bind<IBeatmapDataSource>().To<EmptyDataSource>().FromInstance(emptyDataSource);
             }
 
             if (!Container.HasBinding<IScoreSaberDataSource>())

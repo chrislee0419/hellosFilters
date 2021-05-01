@@ -31,7 +31,7 @@ namespace HUIFilters.Filters.BuiltIn
             CustomCharacteristics.Any(x => x.RequiredAppliedValue != x.RequiredStagingValue);
 
         [UIValue("data-source-available")]
-        public bool DataSourceAvailable => _dataSource.BeatmapData.Count > 0;
+        public bool DataSourceAvailable => _beatmapDataSource.IsDataAvailable;
 
         private bool _oneSaberStagingValue = false;
         [UIValue("one-saber-value")]
@@ -115,7 +115,7 @@ namespace HUIFilters.Filters.BuiltIn
 
         protected override string AssociatedBSMLFile => "HUIFilters.UI.Views.Filters.CharacteristicFilterView.bsml";
 
-        private IDataSource _dataSource;
+        private IBeatmapDataSource _beatmapDataSource;
 
         private HashSet<string> _allCharacteristics = null;
 
@@ -134,9 +134,9 @@ namespace HUIFilters.Filters.BuiltIn
         public const string MissingCustomCharacteristicSerializedName = "MissingCharacteristic";
 
         [Inject]
-        public CharacteristicFilter(IDataSource dataSource)
+        public CharacteristicFilter(IBeatmapDataSource beatmapDataSource)
         {
-            _dataSource = dataSource;
+            _beatmapDataSource = beatmapDataSource;
         }
 
         public void Initialize()
@@ -345,9 +345,9 @@ namespace HUIFilters.Filters.BuiltIn
 
         private bool LightshowExistsForLevel(IPreviewBeatmapLevel level)
         {
-            return DataSourceAvailable &&
+            return _beatmapDataSource.IsDataAvailable &&
                 level is CustomPreviewBeatmapLevel customLevel &&
-                _dataSource.BeatmapData.TryGetValue(BeatmapUtilities.GetCustomLevelHash(customLevel), out var metadata) &&
+                _beatmapDataSource.BeatmapData.TryGetValue(BeatmapUtilities.GetCustomLevelHash(customLevel), out var metadata) &&
                 metadata.Characteristics.Values.Any(x => x.Any(y => y.NoteCount == 0));
         }
 

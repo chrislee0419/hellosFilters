@@ -4,8 +4,10 @@ using HUIFilters.DataSources.DataTypes;
 
 namespace HUIFilters.DataSources
 {
-    internal class EmptyDataSource : IDataSource, IScoreSaberDataSource, IBeatSaverDataSource
+    internal class EmptyDataSource : IBeatmapDataSource, IScoreSaberDataSource, IBeatSaverDataSource
     {
+        public bool IsDataAvailable => false;
+
         private ReadOnlyDictionary<string, BeatmapMetaData> _beatmapData = new ReadOnlyDictionary<string, BeatmapMetaData>(new Dictionary<string, BeatmapMetaData>(0));
         public IReadOnlyDictionary<string, BeatmapMetaData> BeatmapData => _beatmapData;
 

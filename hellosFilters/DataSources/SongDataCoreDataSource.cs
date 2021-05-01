@@ -12,8 +12,10 @@ using SDCPlugin = SongDataCore.Plugin;
 
 namespace HUIFilters.DataSources
 {
-    internal class SongDataCoreDataSource : IInitializable, IDisposable, IDataSource, IScoreSaberDataSource, IBeatSaverDataSource
+    internal class SongDataCoreDataSource : IInitializable, IDisposable, IBeatmapDataSource, IScoreSaberDataSource, IBeatSaverDataSource
     {
+        public bool IsDataAvailable => _beatmapData.Count > 0 || _scoreSaberData.Count > 0 || _beatSaverData.Count > 0;
+
         private Dictionary<string, BeatmapMetaData> _beatmapData = new Dictionary<string, BeatmapMetaData>(StringComparer.InvariantCultureIgnoreCase);
         private ReadOnlyDictionary<string, BeatmapMetaData> _readOnlyBeatmapData = null;
         public IReadOnlyDictionary<string, BeatmapMetaData> BeatmapData
