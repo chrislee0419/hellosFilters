@@ -1,52 +1,56 @@
-﻿<scroll-view xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-             xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
-             id='root'
-             anchor-min-x='0' anchor-min-y='0'
-             anchor-max-x='1' anchor-max-y='1'
-             anchor-pos-x='0' anchor-pos-y='0'
-             size-delta-x='0' size-delta-y='0'>
-  <horizontal preferred-width='80'
-              bg='round-rect-panel'
-              bg-color='#00000060'
-              pad='2'>
-    <text text='Keep levels that are within a specific range of lengths.'
-          font-size='2.6'
-          word-wrapping='true'
-          italics='true' />
-  </horizontal>
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
+    id='root'
+    anchor-min-x='0' anchor-min-y='0'
+    anchor-max-x='1' anchor-max-y='1'
+    anchor-pos-x='0' anchor-pos-y='0'
+    size-delta-x='0' size-delta-y='0'>
+  <scroll-view anchor-min-x='0' anchor-min-y='0'
+               anchor-max-x='1' anchor-max-y='1'
+               anchor-pos-x='0' anchor-pos-y='0'
+               size-delta-x='0' size-delta-y='0'>
+    <horizontal preferred-width='80'
+                bg='round-rect-panel'
+                bg-color='#00000060'
+                pad='2'>
+      <text text='Keep levels that are within a specific range of lengths.'
+            font-size='2.6'
+            word-wrapping='true'
+            italics='true' />
+    </horizontal>
 
-  <toggle-setting text='Remove short levels'
-                  preferred-width='80'
-                  value='min-enabled-value'
-                  bind-value='true'
-                  apply-on-change='true' />
-  <increment-setting id='min-setting'
-                     text='Minimum allowed length'
-                     preferred-width='80'
-                     interactable='~min-setting-interactable'
-                     value='min-value'
-                     increment='~inc-value'
-                     min='~min-setting-min-value'
-                     integer-only='true'
-                     bind-value='true'
-                     apply-on-change='true'
-                     formatter='duration-formatter' />
+    <toggle-setting text='Remove short levels'
+                    preferred-width='80'
+                    value='min-enabled-value'
+                    bind-value='true'
+                    apply-on-change='true' />
+    <increment-setting id='min-setting'
+                       text='Minimum allowed length'
+                       preferred-width='80'
+                       interactable='~min-setting-interactable'
+                       value='min-value'
+                       increment='~inc-value'
+                       min='~min-setting-min-value'
+                       integer-only='true'
+                       bind-value='true'
+                       apply-on-change='true'
+                       formatter='duration-formatter' />
 
-  <toggle-setting text='Remove long levels'
-                  preferred-width='80'
-                  value='max-enabled-value'
-                  bind-value='true'
-                  apply-on-change='true' />
-  <increment-setting id='max-setting'
-                     text='Maximum allowed length'
-                     preferred-width='80'
-                     interactable='~max-setting-interactable'
-                     value='max-value'
-                     increment='~inc-value'
-                     max='~max-setting-max-value'
-                     integer-only='true'
-                     bind-value='true'
-                     apply-on-change='true'
-                     formatter='duration-formatter' />
-
-</scroll-view>
+    <toggle-setting text='Remove long levels'
+                    preferred-width='80'
+                    value='max-enabled-value'
+                    bind-value='true'
+                    apply-on-change='true' />
+    <increment-setting id='max-setting'
+                       text='Maximum allowed length'
+                       preferred-width='80'
+                       interactable='~max-setting-interactable'
+                       value='max-value'
+                       increment='~inc-value'
+                       max='~max-setting-max-value'
+                       integer-only='true'
+                       bind-value='true'
+                       apply-on-change='true'
+                       formatter='duration-formatter' />
+  </scroll-view>
+</bg>
