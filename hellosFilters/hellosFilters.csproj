@@ -142,11 +142,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataSources\DataTypes\BeatmapMetaData.cs" />
+    <Compile Include="DataSources\DataTypes\BeatSaverData.cs" />
+    <Compile Include="DataSources\DataTypes\ScoreSaberData.cs" />
+    <Compile Include="DataSources\EmptyDataSource.cs" />
+    <Compile Include="DataSources\IDataSource.cs" />
+    <Compile Include="DataSources\SongDataCoreDataSource.cs" />
     <Compile Include="Filters\BuiltIn\DifficultyFilter.cs" />
     <Compile Include="Filters\BuiltIn\DurationFilter.cs" />
     <Compile Include="Filters\FilterManager.cs" />
     <Compile Include="Filters\IFilter.cs" />
     <Compile Include="Filters\SavedFilterSettings.cs" />
+    <Compile Include="Installers\DataSourceInstaller.cs" />
     <Compile Include="Installers\FilterInstaller.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
@@ -180,6 +187,5 @@
     <EmbeddedResource Include="Assets\appliedfilter.png" />
     <EmbeddedResource Include="Assets\filter.png" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

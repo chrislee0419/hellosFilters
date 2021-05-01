@@ -11,5 +11,8 @@
     "BeatSaberMarkupLanguage": "^1.4.0",
     "SiraUtil": "^2.0.0",
     "hellosUI": "^0.1.0"
-  }
+  },
+  "loadAfter": [
+    "SongDataCore"
+  ]
 }

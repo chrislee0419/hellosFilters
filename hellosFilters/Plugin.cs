@@ -22,6 +22,7 @@ namespace HUIFilters
             PluginConfig.Instance = conf.Generated<PluginConfig>();
 
             zenjector.OnMenu<FilterInstaller>();
+            zenjector.OnMenu<DataSourceInstaller>();
         }
 
 
