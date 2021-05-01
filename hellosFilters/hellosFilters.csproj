@@ -65,6 +65,11 @@
       <HintPath>$(BeatSaberDir)\Plugins\SiraUtil.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="SongCore, Version=3.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Plugins\SongCore.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="SongDataCore, Version=1.3.5.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\SongDataCore.dll</HintPath>
@@ -148,6 +153,7 @@
     <Compile Include="DataSources\EmptyDataSource.cs" />
     <Compile Include="DataSources\IDataSource.cs" />
     <Compile Include="DataSources\SongDataCoreDataSource.cs" />
+    <Compile Include="Filters\BuiltIn\CharacteristicFilter.cs" />
     <Compile Include="Filters\BuiltIn\DifficultyFilter.cs" />
     <Compile Include="Filters\BuiltIn\DurationFilter.cs" />
     <Compile Include="Filters\FilterManager.cs" />
@@ -172,6 +178,7 @@
     <EmbeddedResource Include="UI\Views\Screens\SavedFilterSettingsListScreenView.bsml" />
     <EmbeddedResource Include="UI\Views\Filters\DifficultyFilterView.bsml" />
     <EmbeddedResource Include="UI\Views\Filters\DurationFilterView.bsml" />
+    <EmbeddedResource Include="UI\Views\Filters\CharacteristicFilterView.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">

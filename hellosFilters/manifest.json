@@ -8,6 +8,7 @@
   "gameVersion": "1.13.2",
   "dependsOn": {
     "BSIPA": "^4.0.5",
+    "SongCore": "^3.0.0",
     "BeatSaberMarkupLanguage": "^1.4.0",
     "SiraUtil": "^2.0.0",
     "hellosUI": "^0.1.0"
