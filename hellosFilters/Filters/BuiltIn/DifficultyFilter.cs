@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Zenject;
 using BeatSaberMarkupLanguage.Attributes;
 
 namespace HUIFilters.Filters.BuiltIn
@@ -102,6 +103,8 @@ namespace HUIFilters.Filters.BuiltIn
 
         protected override string AssociatedBSMLFile => "HUIFilters.UI.Views.Filters.DifficultyFilterView.bsml";
 
+        private CharacteristicFilter _characteristicFilter;
+
         private HashSet<BeatmapDifficulty> _allDifficulties = null;
 
         private const string EasySettingName = "easy";
@@ -109,6 +112,12 @@ namespace HUIFilters.Filters.BuiltIn
         private const string HardSettingName = "hard";
         private const string ExpertSettingName = "expert";
         private const string ExpertPlusSettingName = "expertplus";
+
+        [Inject]
+        public DifficultyFilter(CharacteristicFilter characteristicFilter)
+        {
+            _characteristicFilter = characteristicFilter;
+        }
 
         protected override void InternalSetDefaultValuesToStaging()
         {
@@ -181,9 +190,15 @@ namespace HUIFilters.Filters.BuiltIn
 
         public override void FilterLevels(ref List<IPreviewBeatmapLevel> levels)
         {
+            HashSet<string> characteristics = _characteristicFilter.GetSerializedNamesOfAppliedCharacteristics();
+
             for (int i = 0; i < levels.Count;)
             {
-                var diffs = levels[i].previewDifficultyBeatmapSets.SelectMany(x => x.beatmapDifficulties).ToHashSet();
+                var diffs = levels[i].previewDifficultyBeatmapSets
+                    .Where(x => characteristics.Contains(x.beatmapCharacteristic.serializedName))
+                    .SelectMany(x => x.beatmapDifficulties)
+                    .ToHashSet();
+
                 if ((EasyAppliedValue && !diffs.Contains(BeatmapDifficulty.Easy)) ||
                     (NormalAppliedValue && !diffs.Contains(BeatmapDifficulty.Normal)) ||
                     (HardAppliedValue && !diffs.Contains(BeatmapDifficulty.Hard)) ||
