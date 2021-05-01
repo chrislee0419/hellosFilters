@@ -98,7 +98,7 @@ namespace HUIFilters.Filters
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private bool _isStagingValuesFromUI = true;
+        protected bool IsStagingValuesFromUI { get; private set; } = true;
 
         protected void InvokePropertyChanged([CallerMemberName] string propertyName = null) => this.CallAndHandleAction(PropertyChanged, propertyName);
 
@@ -122,7 +122,7 @@ namespace HUIFilters.Filters
         /// <param name="propertyName">The name of the property that has been changed.</param>
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (_isStagingValuesFromUI)
+            if (IsStagingValuesFromUI)
                 InvokeSettingChanged();
             else
                 InvokePropertyChanged(propertyName);
@@ -130,29 +130,30 @@ namespace HUIFilters.Filters
 
         public override void SetDefaultValuesToStaging()
         {
-            _isStagingValuesFromUI = false;
+            IsStagingValuesFromUI = false;
 
             InternalSetDefaultValuesToStaging();
 
-            _isStagingValuesFromUI = true;
+            IsStagingValuesFromUI = true;
         }
 
         public override void SetAppliedValuesToStaging()
         {
-            _isStagingValuesFromUI = false;
+            IsStagingValuesFromUI = false;
 
             InternalSetAppliedValuesToStaging();
 
-            _isStagingValuesFromUI = true;
+            IsStagingValuesFromUI = true;
         }
 
         public override void SetSavedValuesToStaging(IReadOnlyDictionary<string, string> settings)
         {
-            _isStagingValuesFromUI = false;
+            IsStagingValuesFromUI = false;
 
+            InternalSetDefaultValuesToStaging();
             InternalSetSavedValuesToStaging(settings);
 
-            _isStagingValuesFromUI = true;
+            IsStagingValuesFromUI = true;
         }
 
         protected abstract void InternalSetDefaultValuesToStaging();

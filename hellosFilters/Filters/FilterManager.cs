@@ -92,7 +92,7 @@ namespace HUIFilters.Filters
 
 #if DEBUG
             sw.Stop();
-            Plugin.Log.Notice($"Filters applied in {sw.ElapsedMilliseconds}ms (kept {levels.Count} out of {levelCount} levels)");
+            Plugin.Log.Info($"Filters applied in {sw.ElapsedMilliseconds}ms (kept {levels.Count} out of {levelCount} levels)");
 #endif
 
             modifiedLevelCollection = levels;
