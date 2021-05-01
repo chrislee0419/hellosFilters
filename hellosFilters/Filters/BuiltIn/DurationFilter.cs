@@ -5,17 +5,17 @@ using BeatSaberMarkupLanguage.Components.Settings;
 
 namespace HUIFilters.Filters.BuiltIn
 {
-    internal class DurationFilter : NotifiableBSMLViewFilterBase
+    public sealed class DurationFilter : NotifiableBSMLViewFilterBase
     {
         public override string Name => "Song Length";
         public override bool IsAvailable => true;
 
-        public override bool IsApplied => _minEnabledAppliedValue || _maxEnabledAppliedValue;
+        public override bool IsApplied => MinEnabledAppliedValue || MaxEnabledAppliedValue;
         public override bool HasChanges => 
-            _minEnabledAppliedValue != _minEnabledStagingValue ||
-            _maxEnabledAppliedValue != _maxEnabledStagingValue ||
-            (_minEnabledStagingValue && _minAppliedValue != _minStagingValue) ||
-            (_maxEnabledStagingValue && _maxAppliedValue != _maxStagingValue);
+            MinEnabledAppliedValue != _minEnabledStagingValue ||
+            MaxEnabledAppliedValue != _maxEnabledStagingValue ||
+            (_minEnabledStagingValue && MinAppliedValue != _minStagingValue) ||
+            (_maxEnabledStagingValue && MaxAppliedValue != _maxStagingValue);
 
         private bool _minEnabledStagingValue = false;
         [UIValue("min-enabled-value")]
@@ -118,6 +118,11 @@ namespace HUIFilters.Filters.BuiltIn
             }
         }
 
+        public bool MinEnabledAppliedValue { get; private set; } = false;
+        public bool MaxEnabledAppliedValue { get; private set; } = false;
+        public int MinAppliedValue { get; private set; } = DefaultMinValue;
+        public int MaxAppliedValue { get; private set; } = DefaultMaxValue;
+
         [UIValue("min-setting-interactable")]
         public bool MinSettingInteractable => _minEnabledStagingValue;
         [UIValue("max-setting-interactable")]
@@ -136,11 +141,6 @@ namespace HUIFilters.Filters.BuiltIn
         [UIComponent("max-setting")]
         private IncrementSetting _maxSetting;
 #pragma warning restore CS0649
-
-        private bool _minEnabledAppliedValue = false;
-        private bool _maxEnabledAppliedValue = false;
-        private int _minAppliedValue = DefaultMinValue;
-        private int _maxAppliedValue = DefaultMaxValue;
 
         private const string MinEnabledSettingName = "minEnabled";
         private const string MaxEnabledSettingName = "maxEnabled";
@@ -167,10 +167,10 @@ namespace HUIFilters.Filters.BuiltIn
 
         protected override void InternalSetAppliedValuesToStaging()
         {
-            MinEnabledStagingValue = _minEnabledAppliedValue;
-            MaxEnabledStagingValue = _maxEnabledAppliedValue;
-            MinStagingValue = _minAppliedValue;
-            MaxStagingValue = _maxAppliedValue;
+            MinEnabledStagingValue = MinEnabledAppliedValue;
+            MaxEnabledStagingValue = MaxEnabledAppliedValue;
+            MinStagingValue = MinAppliedValue;
+            MaxStagingValue = MaxAppliedValue;
         }
 
         protected override void InternalSetSavedValuesToStaging(IReadOnlyDictionary<string, string> settings)
@@ -203,30 +203,34 @@ namespace HUIFilters.Filters.BuiltIn
 
         public override void ApplyStagingValues()
         {
-            _minEnabledAppliedValue = _minEnabledStagingValue;
-            _maxEnabledAppliedValue = _maxEnabledStagingValue;
-            _minAppliedValue = _minStagingValue;
-            _maxAppliedValue = _maxStagingValue;
+            MinEnabledAppliedValue = _minEnabledStagingValue;
+            MaxEnabledAppliedValue = _maxEnabledStagingValue;
+            MinAppliedValue = _minStagingValue;
+            MaxAppliedValue = _maxStagingValue;
         }
 
         public override void ApplyDefaultValues()
         {
-            _minEnabledAppliedValue = false;
-            _maxEnabledAppliedValue = false;
-            _minAppliedValue = DefaultMinValue;
-            _maxAppliedValue = DefaultMaxValue;
+            MinEnabledAppliedValue = false;
+            MaxEnabledAppliedValue = false;
+            MinAppliedValue = DefaultMinValue;
+            MaxAppliedValue = DefaultMaxValue;
         }
 
         public override void FilterLevels(ref List<IPreviewBeatmapLevel> levels)
         {
-            for (int i = 0; i < levels.Count; ++i)
+            for (int i = 0; i < levels.Count;)
             {
                 float songDuration = levels[i].songDuration;
 
-                if ((_minEnabledAppliedValue && songDuration < _minAppliedValue) ||
-                    (_maxEnabledAppliedValue && songDuration > _maxAppliedValue))
+                if ((MinEnabledAppliedValue && songDuration < MinAppliedValue) ||
+                    (MaxEnabledAppliedValue && songDuration > MaxAppliedValue))
                 {
-                    levels.RemoveAt(i--);
+                    levels.RemoveAt(i);
+                }
+                else
+                {
+                    ++i;
                 }
             }
         }
@@ -235,10 +239,10 @@ namespace HUIFilters.Filters.BuiltIn
         {
             return new Dictionary<string, string>
             {
-                { MinEnabledSettingName, _minEnabledAppliedValue.ToString() },
-                { MaxEnabledSettingName, _maxEnabledAppliedValue.ToString() },
-                { MinSettingName, _minAppliedValue.ToString() },
-                { MaxSettingName, _maxAppliedValue.ToString() }
+                { MinEnabledSettingName, MinEnabledAppliedValue.ToString() },
+                { MaxEnabledSettingName, MaxEnabledAppliedValue.ToString() },
+                { MinSettingName, MinAppliedValue.ToString() },
+                { MaxSettingName, MaxAppliedValue.ToString() }
             };
         }
 

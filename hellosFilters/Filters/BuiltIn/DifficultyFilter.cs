@@ -4,23 +4,23 @@ using BeatSaberMarkupLanguage.Attributes;
 
 namespace HUIFilters.Filters.BuiltIn
 {
-    internal class DifficultyFilter : NotifiableBSMLViewFilterBase
+    public sealed class DifficultyFilter : NotifiableBSMLViewFilterBase
     {
         public override string Name => "Difficulty";
         public override bool IsAvailable => true;
 
         public override bool IsApplied =>
-            _easyAppliedValue ||
-            _normalAppliedValue ||
-            _hardAppliedValue ||
-            _expertAppliedValue ||
-            _expertPlusAppliedValue;
+            EasyAppliedValue ||
+            NormalAppliedValue ||
+            HardAppliedValue ||
+            ExpertAppliedValue ||
+            ExpertPlusAppliedValue;
         public override bool HasChanges =>
-            _easyAppliedValue != _easyStagingValue ||
-            _normalAppliedValue != _normalStagingValue ||
-            _hardAppliedValue != _hardStagingValue ||
-            _expertAppliedValue != _expertStagingValue ||
-            _expertPlusAppliedValue != _expertPlusStagingValue;
+            EasyAppliedValue != _easyStagingValue ||
+            NormalAppliedValue != _normalStagingValue ||
+            HardAppliedValue != _hardStagingValue ||
+            ExpertAppliedValue != _expertStagingValue ||
+            ExpertPlusAppliedValue != _expertPlusStagingValue;
 
         private bool _easyStagingValue = false;
         [UIValue("easy-value")]
@@ -93,13 +93,13 @@ namespace HUIFilters.Filters.BuiltIn
             }
         }
 
-        protected override string AssociatedBSMLFile => "HUIFilters.UI.Views.Filters.DifficultyFilterView.bsml";
+        public bool EasyAppliedValue { get; private set; } = false;
+        public bool NormalAppliedValue { get; private set; } = false;
+        public bool HardAppliedValue { get; private set; } = false;
+        public bool ExpertAppliedValue { get; private set; } = false;
+        public bool ExpertPlusAppliedValue { get; private set; } = false;
 
-        private bool _easyAppliedValue = false;
-        private bool _normalAppliedValue = false;
-        private bool _hardAppliedValue = false;
-        private bool _expertAppliedValue = false;
-        private bool _expertPlusAppliedValue = false;
+        protected override string AssociatedBSMLFile => "HUIFilters.UI.Views.Filters.DifficultyFilterView.bsml";
 
         private const string EasySettingName = "easy";
         private const string NormalSettingName = "normal";
@@ -118,11 +118,11 @@ namespace HUIFilters.Filters.BuiltIn
 
         protected override void InternalSetAppliedValuesToStaging()
         {
-            EasyStagingValue = _easyAppliedValue;
-            NormalStagingValue = _normalAppliedValue;
-            HardStagingValue = _hardAppliedValue;
-            ExpertStagingValue = _expertAppliedValue;
-            ExpertPlusStagingValue = _expertPlusAppliedValue;
+            EasyStagingValue = EasyAppliedValue;
+            NormalStagingValue = NormalAppliedValue;
+            HardStagingValue = HardAppliedValue;
+            ExpertStagingValue = ExpertAppliedValue;
+            ExpertPlusStagingValue = ExpertPlusAppliedValue;
         }
 
         protected override void InternalSetSavedValuesToStaging(IReadOnlyDictionary<string, string> settings)
@@ -160,34 +160,38 @@ namespace HUIFilters.Filters.BuiltIn
 
         public override void ApplyStagingValues()
         {
-            _easyAppliedValue = _easyStagingValue;
-            _normalAppliedValue = _normalStagingValue;
-            _hardAppliedValue = _hardStagingValue;
-            _expertAppliedValue = _expertStagingValue;
-            _expertPlusAppliedValue = _expertPlusStagingValue;
+            EasyAppliedValue = _easyStagingValue;
+            NormalAppliedValue = _normalStagingValue;
+            HardAppliedValue = _hardStagingValue;
+            ExpertAppliedValue = _expertStagingValue;
+            ExpertPlusAppliedValue = _expertPlusStagingValue;
         }
 
         public override void ApplyDefaultValues()
         {
-            _easyAppliedValue = false;
-            _normalAppliedValue = false;
-            _hardAppliedValue = false;
-            _expertAppliedValue = false;
-            _expertPlusAppliedValue = false;
+            EasyAppliedValue = false;
+            NormalAppliedValue = false;
+            HardAppliedValue = false;
+            ExpertAppliedValue = false;
+            ExpertPlusAppliedValue = false;
         }
 
         public override void FilterLevels(ref List<IPreviewBeatmapLevel> levels)
         {
-            for (int i = 0; i < levels.Count; ++i)
+            for (int i = 0; i < levels.Count;)
             {
                 var diffs = levels[i].previewDifficultyBeatmapSets.SelectMany(x => x.beatmapDifficulties).ToHashSet();
-                if ((_easyAppliedValue && !diffs.Contains(BeatmapDifficulty.Easy)) ||
-                    (_normalAppliedValue && !diffs.Contains(BeatmapDifficulty.Normal)) ||
-                    (_hardAppliedValue && !diffs.Contains(BeatmapDifficulty.Hard)) ||
-                    (_expertAppliedValue && !diffs.Contains(BeatmapDifficulty.Expert)) ||
-                    (_expertPlusAppliedValue && !diffs.Contains(BeatmapDifficulty.ExpertPlus)))
+                if ((EasyAppliedValue && !diffs.Contains(BeatmapDifficulty.Easy)) ||
+                    (NormalAppliedValue && !diffs.Contains(BeatmapDifficulty.Normal)) ||
+                    (HardAppliedValue && !diffs.Contains(BeatmapDifficulty.Hard)) ||
+                    (ExpertAppliedValue && !diffs.Contains(BeatmapDifficulty.Expert)) ||
+                    (ExpertPlusAppliedValue && !diffs.Contains(BeatmapDifficulty.ExpertPlus)))
                 {
-                    levels.RemoveAt(i--);
+                    levels.RemoveAt(i);
+                }
+                else
+                {
+                    ++i;
                 }
             }
         }
@@ -196,11 +200,11 @@ namespace HUIFilters.Filters.BuiltIn
         {
             return new Dictionary<string, string>
             {
-                { EasySettingName, _easyAppliedValue.ToString() },
-                { NormalSettingName, _normalAppliedValue.ToString() },
-                { HardSettingName, _hardAppliedValue.ToString() },
-                { ExpertSettingName, _expertAppliedValue.ToString() },
-                { ExpertPlusSettingName, _expertPlusAppliedValue.ToString() }
+                { EasySettingName, EasyAppliedValue.ToString() },
+                { NormalSettingName, NormalAppliedValue.ToString() },
+                { HardSettingName, HardAppliedValue.ToString() },
+                { ExpertSettingName, ExpertAppliedValue.ToString() },
+                { ExpertPlusSettingName, ExpertPlusAppliedValue.ToString() }
             };
         }
     }
