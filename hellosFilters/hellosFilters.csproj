@@ -167,6 +167,7 @@
     <Compile Include="UI\Screens\SavedFilterSettingsListScreenManager.cs" />
     <Compile Include="UI\Screens\FilterSettingsScreenManager.cs" />
     <Compile Include="UI\Screens\FilterWidgetScreenManager.cs" />
+    <Compile Include="Utilities\FilterUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />

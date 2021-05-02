@@ -7,6 +7,7 @@ using UnityEngine;
 using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using HUI.Utilities;
+using BSMLUtilities = BeatSaberMarkupLanguage.Utilities;
 
 namespace HUIFilters.Filters
 {
@@ -66,7 +67,7 @@ namespace HUIFilters.Filters
                 return;
             }
 
-            BSMLParser.instance.Parse(Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), AssociatedBSMLFile), parentGO, this);
+            BSMLParser.instance.Parse(BSMLUtilities.GetResourceContent(Assembly.GetExecutingAssembly(), AssociatedBSMLFile), parentGO, this);
 
             _viewGO.name = $"{this.GetType().Name}View";
         }
