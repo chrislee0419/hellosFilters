@@ -194,13 +194,16 @@ namespace HUIFilters.Filters.BuiltIn
 
             var levelsToRemove = levels.AsParallel().Where(delegate (IPreviewBeatmapLevel level)
             {
-                List<BeatmapPlayerStats> stats = GetBeatmapPlayerStatsForLevel(level, characteristicsToCheck, difficultiesToCheck);
+                bool completed;
+                bool fullCombo;
+                RankModel.Rank? lowestRankAchieved;
+                RankModel.Rank? highestRankAchieved;
+                (completed, fullCombo, lowestRankAchieved, highestRankAchieved) = GetBeatmapPlayerStatsForLevel(level, characteristicsToCheck, difficultiesToCheck);
 
                 if (CompletedAppliedValue != FilterOptions.Off)
                 {
-                    bool levelCompleted = stats.Count > 0;
-                    if ((CompletedAppliedValue == FilterOptions.OptionUnfulfilled && levelCompleted) ||
-                        (CompletedAppliedValue == FilterOptions.OptionFulfilled && !levelCompleted))
+                    if ((CompletedAppliedValue == FilterOptions.OptionUnfulfilled && completed) ||
+                        (CompletedAppliedValue == FilterOptions.OptionFulfilled && !completed))
                     {
                         return true;
                     }
@@ -208,35 +211,27 @@ namespace HUIFilters.Filters.BuiltIn
 
                 if (FullComboAppliedValue != FilterOptions.Off)
                 {
-                    bool hasFullCombo = stats.Any(x => x.fullCombo);
-                    if ((FullComboAppliedValue == FilterOptions.OptionUnfulfilled && hasFullCombo) ||
-                        (FullComboAppliedValue == FilterOptions.OptionFulfilled && !hasFullCombo))
+                    if ((FullComboAppliedValue == FilterOptions.OptionUnfulfilled && fullCombo) ||
+                        (FullComboAppliedValue == FilterOptions.OptionFulfilled && !fullCombo))
                     {
                         return true;
                     }
                 }
 
-                if (LowestRankAppliedValue != LowestRankDefaultValue ||
-                    HighestRankAppliedValue != HighestRankDefaultValue)
+                if (LowestRankAppliedValue != LowestRankDefaultValue || HighestRankAppliedValue != HighestRankDefaultValue)
                 {
-                    bool hasRankData = stats.Any(x => x.maxRank.HasValue);
-
-                    if (!hasRankData && LowestRankAppliedValue != LowestRankDefaultValue)
+                    if (!lowestRankAchieved.HasValue)
                     {
-                        return true;
+                        if (LowestRankAppliedValue != LowestRankDefaultValue)
+                            return true;
                     }
-                    else if (hasRankData)
+                    else if ((LowestRankAppliedValue != LowestRankDefaultValue && highestRankAchieved < LowestRankAppliedValue) ||
+                            (HighestRankAppliedValue != HighestRankDefaultValue && lowestRankAchieved > HighestRankAppliedValue))
                     {
-                        if (LowestRankAppliedValue != LowestRankDefaultValue &&
-                            stats.All(x => (x.maxRank.HasValue ? x.maxRank.Value : LowestRankDefaultValue) < LowestRankAppliedValue))
-                        {
-                            return true;
-                        }
-                        else if (HighestRankAppliedValue != HighestRankDefaultValue &&
-                            stats.All(x => (x.maxRank.HasValue ? x.maxRank.Value : HighestRankDefaultValue) > HighestRankAppliedValue))
-                        {
-                            return true;
-                        }
+                        // we want to remove levels where ranks from ALL difficulties do not pass the filter
+                        // ex: if a level has S rank on normal and B rank on hard, the level will not be removed if
+                        //     LowestRankAppliedValue is set to A because the normal difficulty passes the filter
+                        return true;
                     }
                 }
 
@@ -263,10 +258,24 @@ namespace HUIFilters.Filters.BuiltIn
             };
         }
 
-        private List<BeatmapPlayerStats> GetBeatmapPlayerStatsForLevel(IPreviewBeatmapLevel level, HashSet<string> characteristicsToCheck, HashSet<BeatmapDifficulty> difficultiesToCheck)
+        private (bool, bool, RankModel.Rank?, RankModel.Rank?) GetBeatmapPlayerStatsForLevel(
+            IPreviewBeatmapLevel level,
+            HashSet<string> characteristicsToCheck,
+            HashSet<BeatmapDifficulty> difficultiesToCheck)
         {
-            List<BeatmapPlayerStats> stats = new List<BeatmapPlayerStats>();
+            bool completed = false;
+            bool fullCombo = false;
+            RankModel.Rank? lowestRankAchieved = null;
+            RankModel.Rank? highestRankAchieved = null;
 
+            string simplifiedLevelID = BeatmapUtilities.GetSimplifiedLevelID(level);
+            var soloStats = _playerDataModel.playerData.levelsStatsData.Where(x =>
+                x.levelID.StartsWith(simplifiedLevelID) &&
+                x.validScore).ToList();
+            var localLeaderboards = _localLeaderboardsModel
+                .GetLeaderboardsData(LocalLeaderboardsModel.LeaderboardType.AllTime)
+                .Where(x => x._leaderboardId.StartsWith(simplifiedLevelID))
+                .ToList();
             foreach (var characteristic in level.previewDifficultyBeatmapSets)
             {
                 string serializedName = characteristic.beatmapCharacteristic.serializedName;
@@ -278,106 +287,74 @@ namespace HUIFilters.Filters.BuiltIn
                     if (!difficultiesToCheck.Contains(difficulty))
                         continue;
 
-                    if (GetBeatmapPlayerStatsForDifficulty(level, serializedName, difficulty, out var beatmapPlayerStats))
-                        stats.Add(beatmapPlayerStats);
+                    string leaderboardIDSuffix = $"{(serializedName == CharacteristicFilter.StandardSerializedName ? "" : serializedName)}{difficulty}";
+                    var beatmapSpecificSoloStats = soloStats.Where(x => x.beatmapCharacteristic.serializedName == serializedName && x.difficulty == difficulty);
+                    var beatmapSpecificLocalLoaderboards = localLeaderboards.Where(x => x._leaderboardId.EndsWith(leaderboardIDSuffix));
+                    if (GetBeatmapPlayerStatsForDifficulty(level, serializedName, difficulty, beatmapSpecificSoloStats, beatmapSpecificLocalLoaderboards, out var hasFullCombo, out var bestRank))
+                    {
+                        completed = true;
+                        fullCombo |= hasFullCombo;
+
+                        if (bestRank.HasValue)
+                        {
+                            if (!lowestRankAchieved.HasValue || bestRank.Value < lowestRankAchieved.Value)
+                                lowestRankAchieved = bestRank;
+                            if (!highestRankAchieved.HasValue || bestRank.Value > highestRankAchieved.Value)
+                                highestRankAchieved = bestRank;
+                        }
+                    }
                 }
             }
 
-            return stats;
+            return (completed, fullCombo, lowestRankAchieved, highestRankAchieved);
         }
 
-        private bool GetBeatmapPlayerStatsForDifficulty(IPreviewBeatmapLevel level, string characteristicSerializedName, BeatmapDifficulty difficulty, out BeatmapPlayerStats beatmapPlayerStats)
+        private bool GetBeatmapPlayerStatsForDifficulty(
+            IPreviewBeatmapLevel level,
+            string characteristicSerializedName,
+            BeatmapDifficulty difficulty,
+            IEnumerable<PlayerLevelStatsData> soloStats,
+            IEnumerable<LocalLeaderboardsModel.LeaderboardData> localLeaderboards,
+            out bool fullCombo,
+            out RankModel.Rank? bestRank)
         {
-            string levelID = BeatmapUtilities.GetSimplifiedLevelID(level);
-            bool fullCombo = false;
             int score = -1;
-            RankModel.Rank? maxRank = null;
+            fullCombo = false;
+            bestRank = null;
 
             // check solo mode stats
-            var validSoloStats = _playerDataModel.playerData.levelsStatsData.Where(x =>
-                x.levelID.StartsWith(levelID) &&
-                x.beatmapCharacteristic.serializedName == characteristicSerializedName &&
-                x.difficulty == difficulty &&
-                x.validScore);
-
-            foreach (var entry in validSoloStats)
+            foreach (var entry in soloStats)
             {
                 fullCombo |= entry.fullCombo;
 
                 if (entry.highScore > score)
                     score = entry.highScore;
 
-                if (!maxRank.HasValue || entry.maxRank > maxRank.Value)
-                    maxRank = entry.maxRank;
+                if (!bestRank.HasValue || entry.maxRank > bestRank.Value)
+                    bestRank = entry.maxRank;
             }
 
             // check local party mode stats
-            StringBuilder sb = new StringBuilder();
-            foreach (var duplicateLevelID in GetDuplicateLevelIDsForLevelID(levelID))
+            foreach (var leaderboard in localLeaderboards)
             {
-                sb.Clear();
-                sb.Append(duplicateLevelID);
-
-                if (characteristicSerializedName != CharacteristicFilter.StandardSerializedName)
-                    sb.Append(characteristicSerializedName);
-
-                sb.Append(difficulty.ToString());
-
-                var validPartyStats = _localLeaderboardsModel.GetScores(sb.ToString(), LocalLeaderboardsModel.LeaderboardType.AllTime);
-                if (validPartyStats == null)
-                    continue;
-
-                foreach (var entry in validPartyStats)
+                foreach (var entry in leaderboard._scores)
                 {
                     fullCombo |= entry._fullCombo;
 
                     if (entry._score > score)
+                    {
                         score = entry._score;
 
-                    if (GetRankFromScore(level, entry._score, characteristicSerializedName, difficulty, out var calculatedRank))
-                    {
-                        if (!maxRank.HasValue || calculatedRank > maxRank.Value)
-                            maxRank = calculatedRank;
+                        if (GetRankFromScore(level, entry._score, characteristicSerializedName, difficulty, out var calculatedRank))
+                        {
+                            if (!bestRank.HasValue || calculatedRank > bestRank.Value)
+                                bestRank = calculatedRank;
+                        }
                     }
                 }
             }
 
-            if (score >= 0)
-            {
-                beatmapPlayerStats = new BeatmapPlayerStats(level, characteristicSerializedName, difficulty, fullCombo, score, maxRank);
-                return true;
-            }
-            else
-            {
-                beatmapPlayerStats = default;
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Since a user can have duplicates of the same map, this function gets all the level IDs from all duplicates, 
-        /// given the simplified version of the level ID.
-        /// 
-        /// <para>
-        /// The simplified level ID of a level can be obtained through <see cref="BeatmapUtilities.GetSimplifiedLevelID(IPreviewBeatmapLevel)"/>.
-        /// </para>
-        /// </summary>
-        /// <param name="levelID">A simplified level ID.</param>
-        /// <returns>A <see cref="List{string}"/> containing all levels that match the given level ID.</returns>
-        private List<string> GetDuplicateLevelIDsForLevelID(string levelID)
-        {
-            List<string> duplicateLevelIDs = new List<string>();
-
-            if (!levelID.StartsWith(CustomLevelLoader.kCustomLevelPrefixId))
-            {
-                duplicateLevelIDs.Add(levelID);
-                return duplicateLevelIDs;
-            }
-
-            foreach (var level in Loader.CustomLevelsCollection.beatmapLevels.Where(x => x.levelID.StartsWith(levelID)))
-                duplicateLevelIDs.Add(level.levelID);
-
-            return duplicateLevelIDs;
+            return score >= 0;
         }
 
         private bool GetRankFromScore(IPreviewBeatmapLevel level, int score, string characteristicSerializedName, BeatmapDifficulty difficulty, out RankModel.Rank calculatedRank)
@@ -486,32 +463,6 @@ namespace HUIFilters.Filters.BuiltIn
             Off,
             OptionFulfilled,
             OptionUnfulfilled
-        }
-
-        private readonly struct BeatmapPlayerStats
-        {
-            public readonly IPreviewBeatmapLevel level;
-            public readonly string characteristicSerializedName;
-            public readonly BeatmapDifficulty difficulty;
-
-            public readonly bool fullCombo;
-            public readonly int score;
-            public readonly RankModel.Rank? maxRank;
-
-            public BeatmapPlayerStats(IPreviewBeatmapLevel level,
-                string characteristicSerializedName,
-                BeatmapDifficulty difficulty,
-                bool fullCombo,
-                int score,
-                RankModel.Rank? maxRank)
-            {
-                this.level = level;
-                this.characteristicSerializedName = characteristicSerializedName;
-                this.difficulty = difficulty;
-                this.fullCombo = fullCombo;
-                this.score = score;
-                this.maxRank = maxRank;
-            }
         }
     }
 }
