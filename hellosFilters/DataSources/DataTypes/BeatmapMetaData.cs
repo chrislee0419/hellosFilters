@@ -4,13 +4,13 @@ namespace HUIFilters.DataSources.DataTypes
 {
     public readonly struct BeatmapMetaData
     {
-        private readonly Dictionary<string, List<DifficultyData>> _characteristics;
-        public Dictionary<string, List<DifficultyData>> Characteristics => _characteristics;
+        private readonly Dictionary<string, Dictionary<BeatmapDifficulty, DifficultyData>> _characteristics;
+        public Dictionary<string, Dictionary<BeatmapDifficulty, DifficultyData>> Characteristics => _characteristics;
 
         private readonly double _bpm;
         public double BPM => _bpm;
 
-        public BeatmapMetaData(Dictionary<string, List<DifficultyData>> characteristics, double bpm)
+        public BeatmapMetaData(Dictionary<string, Dictionary<BeatmapDifficulty, DifficultyData>> characteristics, double bpm)
         {
             _characteristics = characteristics;
             _bpm = bpm;

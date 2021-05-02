@@ -348,7 +348,7 @@ namespace HUIFilters.Filters.BuiltIn
             return _beatmapDataSource.IsDataAvailable &&
                 level is CustomPreviewBeatmapLevel customLevel &&
                 _beatmapDataSource.BeatmapData.TryGetValue(BeatmapUtilities.GetCustomLevelHash(customLevel), out var metadata) &&
-                metadata.Characteristics.Values.Any(x => x.Any(y => y.NoteCount == 0));
+                metadata.Characteristics.Values.Any(x => x.Values.Any(y => y.NoteCount == 0));
         }
 
         public class CustomCharacteristic : INotifyPropertyChanged

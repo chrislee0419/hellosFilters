@@ -123,8 +123,8 @@ namespace HUIFilters.DataSources
             int limit = WorkLimit;
             foreach (var (hash, song) in SDCPlugin.Songs.Data.Songs)
             {
-                Dictionary<string, List<BeatmapMetaData.DifficultyData>> beatmapCharacteristics = new Dictionary<string, List<BeatmapMetaData.DifficultyData>>();
-                Dictionary<string, List<ScoreSaberData.DifficultyData>> scoreSabercharacteristics = new Dictionary<string, List<ScoreSaberData.DifficultyData>>();
+                var beatmapCharacteristics = new Dictionary<string, Dictionary<BeatmapDifficulty, BeatmapMetaData.DifficultyData>>();
+                var scoreSabercharacteristics = new Dictionary<string, Dictionary<BeatmapDifficulty, ScoreSaberData.DifficultyData>>();
 
                 if ((--limit) < 0)
                 {
@@ -134,13 +134,20 @@ namespace HUIFilters.DataSources
 
                 foreach (var (characteristic, difficultiesData) in song.characteristics)
                 {
-                    List<BeatmapMetaData.DifficultyData> beatmapDifficulties = new List<BeatmapMetaData.DifficultyData>();
-                    List<ScoreSaberData.DifficultyData> scoreSaberDifficulties = new List<ScoreSaberData.DifficultyData>();
+                    var beatmapDifficulties = new Dictionary<BeatmapDifficulty, BeatmapMetaData.DifficultyData>();
+                    var scoreSaberDifficulties = new Dictionary<BeatmapDifficulty, ScoreSaberData.DifficultyData>();
 
                     foreach (var difficulty in difficultiesData.Values)
                     {
-                        beatmapDifficulties.Add(new BeatmapMetaData.DifficultyData(difficulty.njs, difficulty.nts, difficulty.bmb, difficulty.obs));
-                        scoreSaberDifficulties.Add(new ScoreSaberData.DifficultyData(StringToBeatmapDifficulty(difficulty.diff), difficulty.star, difficulty.pp));
+                        BeatmapDifficulty diffEnum = StringToBeatmapDifficulty(difficulty.diff);
+
+                        beatmapDifficulties.Add(
+                            diffEnum,
+                            new BeatmapMetaData.DifficultyData(difficulty.njs, difficulty.nts, difficulty.bmb, difficulty.obs));
+
+                        scoreSaberDifficulties.Add(
+                            diffEnum,
+                            new ScoreSaberData.DifficultyData(difficulty.star, difficulty.pp));
                     }
 
                     string characteristicSerializedName = BeatStarCharacteristicsToSerializedName(characteristic);
