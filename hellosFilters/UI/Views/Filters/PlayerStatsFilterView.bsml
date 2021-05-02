@@ -1,0 +1,72 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
+    id='root'
+    anchor-min-x='0' anchor-min-y='0'
+    anchor-max-x='1' anchor-max-y='1'
+    anchor-pos-x='0' anchor-pos-y='0'
+    size-delta-x='0' size-delta-y='0'>
+  <scroll-view anchor-min-x='0' anchor-min-y='0'
+               anchor-max-x='1' anchor-max-y='1'
+               anchor-pos-x='0' anchor-pos-y='0'
+               size-delta-x='0' size-delta-y='0'>
+    <horizontal preferred-width='80'
+                bg='round-rect-panel'
+                bg-color='#00000060'
+                pad='2'>
+      <text text='Remove levels according to your play stats.'
+            font-size='2.6'
+            word-wrapping='true'
+            italics='true' />
+    </horizontal>
+
+    <list-setting text='Completed At Least Once'
+                  preferred-width='80'
+                  value='completed-value'
+                  options='filter-options'
+                  bind-value='true'
+                  apply-on-change='true'
+                  formatter='completed-formatter' />
+    <list-setting text='Has Full Combo'
+                  preferred-width='80'
+                  value='full-combo-value'
+                  options='filter-options'
+                  bind-value='true'
+                  apply-on-change='true'
+                  formatter='full-combo-formatter' />
+
+    <vertical preferred-width='80'
+              child-control-height='false'
+              child-expand-height='false'
+              child-expand-width='false'
+              vertical-fit='PreferredSize'>
+      <horizontal pad='1'>
+        <text text='RANK FILTER'
+              font-size='2.8'
+              font-color='#AAAAAA' />
+      </horizontal>
+      <horizontal bg='round-rect-panel'
+                  bg-color='#00000060'
+                  vertical-fit='PreferredSize'
+                  horizontal-fit='Unconstrained'
+                  pad='2'>
+        <text text='Use the Highest Rank filter to find levels with scores that you want to improve. Use the Lowest Rank filter to find levels that you have done well on.'
+              font-size='2.5'
+              word-wrapping='true'
+              italics='true' />
+      </horizontal>
+      
+      <list-setting text='Highest Rank Achieved'
+                    value='highest-rank-value'
+                    options='highest-rank-options'
+                    bind-value='true'
+                    apply-on-change='true'
+                    formatter='highest-rank-formatter' />
+      <list-setting text='Lowest Rank Achieved'
+                    value='lowest-rank-value'
+                    options='lowest-rank-options'
+                    bind-value='true'
+                    apply-on-change='true'
+                    formatter='lowest-rank-formatter' />
+    </vertical>
+  </scroll-view>
+</bg>

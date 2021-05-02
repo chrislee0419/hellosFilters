@@ -55,6 +55,11 @@
       <HintPath>$(BeatSaberDir)\Plugins\BS_Utils.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="GameplayCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\GameplayCore.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="hellosUI, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\hellosUI.dll</HintPath>
@@ -156,6 +161,7 @@
     <Compile Include="Filters\BuiltIn\CharacteristicFilter.cs" />
     <Compile Include="Filters\BuiltIn\DifficultyFilter.cs" />
     <Compile Include="Filters\BuiltIn\DurationFilter.cs" />
+    <Compile Include="Filters\BuiltIn\PlayerStatsFilter.cs" />
     <Compile Include="Filters\FilterManager.cs" />
     <Compile Include="Filters\IFilter.cs" />
     <Compile Include="Filters\SavedFilterSettings.cs" />
@@ -180,6 +186,7 @@
     <EmbeddedResource Include="UI\Views\Filters\DifficultyFilterView.bsml" />
     <EmbeddedResource Include="UI\Views\Filters\DurationFilterView.bsml" />
     <EmbeddedResource Include="UI\Views\Filters\CharacteristicFilterView.bsml" />
+    <EmbeddedResource Include="UI\Views\Filters\PlayerStatsFilterView.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
