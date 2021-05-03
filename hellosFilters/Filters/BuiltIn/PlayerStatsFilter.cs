@@ -200,22 +200,18 @@ namespace HUIFilters.Filters.BuiltIn
                 RankModel.Rank? highestRankAchieved;
                 (completed, fullCombo, lowestRankAchieved, highestRankAchieved) = GetBeatmapPlayerStatsForLevel(level, characteristicsToCheck, difficultiesToCheck);
 
-                if (CompletedAppliedValue != FilterOptions.Off)
+                if (CompletedAppliedValue != FilterOptions.Off &&
+                    ((CompletedAppliedValue == FilterOptions.OptionUnfulfilled && completed) ||
+                    (CompletedAppliedValue == FilterOptions.OptionFulfilled && !completed)))
                 {
-                    if ((CompletedAppliedValue == FilterOptions.OptionUnfulfilled && completed) ||
-                        (CompletedAppliedValue == FilterOptions.OptionFulfilled && !completed))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
 
-                if (FullComboAppliedValue != FilterOptions.Off)
+                if (FullComboAppliedValue != FilterOptions.Off &&
+                    ((FullComboAppliedValue == FilterOptions.OptionUnfulfilled && fullCombo) ||
+                    (FullComboAppliedValue == FilterOptions.OptionFulfilled && !fullCombo)))
                 {
-                    if ((FullComboAppliedValue == FilterOptions.OptionUnfulfilled && fullCombo) ||
-                        (FullComboAppliedValue == FilterOptions.OptionFulfilled && !fullCombo))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
 
                 if (LowestRankAppliedValue != LowestRankDefaultValue || HighestRankAppliedValue != HighestRankDefaultValue)
@@ -288,9 +284,10 @@ namespace HUIFilters.Filters.BuiltIn
                         continue;
 
                     string leaderboardIDSuffix = $"{(serializedName == CharacteristicFilter.StandardSerializedName ? "" : serializedName)}{difficulty}";
-                    var beatmapSpecificSoloStats = soloStats.Where(x => x.beatmapCharacteristic.serializedName == serializedName && x.difficulty == difficulty);
-                    var beatmapSpecificLocalLoaderboards = localLeaderboards.Where(x => x._leaderboardId.EndsWith(leaderboardIDSuffix));
-                    if (GetBeatmapPlayerStatsForDifficulty(level, serializedName, difficulty, beatmapSpecificSoloStats, beatmapSpecificLocalLoaderboards, out var hasFullCombo, out var bestRank))
+                    var levelSpecificSoloStats = soloStats.Where(x => x.beatmapCharacteristic.serializedName == serializedName && x.difficulty == difficulty);
+                    var levelSpecificLocalLoaderboards = localLeaderboards.Where(x => x._leaderboardId.EndsWith(leaderboardIDSuffix));
+                    int maxRawScore = GetMaxRawScore(level, serializedName, difficulty);
+                    if (GetBeatmapPlayerStatsForLevel(levelSpecificSoloStats, levelSpecificLocalLoaderboards, maxRawScore, out var hasFullCombo, out var bestRank))
                     {
                         completed = true;
                         fullCombo |= hasFullCombo;
@@ -309,12 +306,10 @@ namespace HUIFilters.Filters.BuiltIn
             return (completed, fullCombo, lowestRankAchieved, highestRankAchieved);
         }
 
-        private bool GetBeatmapPlayerStatsForDifficulty(
-            IPreviewBeatmapLevel level,
-            string characteristicSerializedName,
-            BeatmapDifficulty difficulty,
-            IEnumerable<PlayerLevelStatsData> soloStats,
-            IEnumerable<LocalLeaderboardsModel.LeaderboardData> localLeaderboards,
+        private bool GetBeatmapPlayerStatsForLevel(
+            IEnumerable<PlayerLevelStatsData> levelSpecificsoloStats,
+            IEnumerable<LocalLeaderboardsModel.LeaderboardData> levelSpecificlocalLeaderboards,
+            int maxRawScore,
             out bool fullCombo,
             out RankModel.Rank? bestRank)
         {
@@ -323,7 +318,7 @@ namespace HUIFilters.Filters.BuiltIn
             bestRank = null;
 
             // check solo mode stats
-            foreach (var entry in soloStats)
+            foreach (var entry in levelSpecificsoloStats)
             {
                 fullCombo |= entry.fullCombo;
 
@@ -335,7 +330,7 @@ namespace HUIFilters.Filters.BuiltIn
             }
 
             // check local party mode stats
-            foreach (var leaderboard in localLeaderboards)
+            foreach (var leaderboard in levelSpecificlocalLeaderboards)
             {
                 foreach (var entry in leaderboard._scores)
                 {
@@ -345,8 +340,9 @@ namespace HUIFilters.Filters.BuiltIn
                     {
                         score = entry._score;
 
-                        if (GetRankFromScore(level, entry._score, characteristicSerializedName, difficulty, out var calculatedRank))
+                        if (maxRawScore >= 0)
                         {
+                            var calculatedRank = RankModel.GetRankForScore(score, score, maxRawScore, maxRawScore);
                             if (!bestRank.HasValue || calculatedRank > bestRank.Value)
                                 bestRank = calculatedRank;
                         }
@@ -357,7 +353,7 @@ namespace HUIFilters.Filters.BuiltIn
             return score >= 0;
         }
 
-        private bool GetRankFromScore(IPreviewBeatmapLevel level, int score, string characteristicSerializedName, BeatmapDifficulty difficulty, out RankModel.Rank calculatedRank)
+        private int GetMaxRawScore(IPreviewBeatmapLevel level, string characteristicSerializedName, BeatmapDifficulty difficulty)
         {
             // NOTE: calculations here to get the max rank do not take modifiers into account, since that information isn't stored
             // it is assumed that none of the scores set have used modifiers
@@ -369,10 +365,7 @@ namespace HUIFilters.Filters.BuiltIn
             {
                 // custom levels on local leaderboards need an IBeatmapDataSource to get the rank
                 // since the rank is calculated via note count
-                int maxRawScore = ScoreModel.MaxRawScoreForNumberOfNotes(difficultyMetadata.NoteCount);
-                calculatedRank = RankModel.GetRankForScore(score, score, maxRawScore, maxRawScore);
-
-                return true;
+                return ScoreModel.MaxRawScoreForNumberOfNotes(difficultyMetadata.NoteCount);
             }
             else if (level is IBeatmapLevel ostLevel)
             {
@@ -381,17 +374,11 @@ namespace HUIFilters.Filters.BuiltIn
                 {
                     var difficultyData = characteristicData.difficultyBeatmaps.FirstOrDefault(x => x.difficulty == difficulty);
                     if (difficultyData != null)
-                    {
-                        int maxRawScore = ScoreModel.MaxRawScoreForNumberOfNotes(difficultyData.beatmapData.cuttableNotesType);
-                        calculatedRank = RankModel.GetRankForScore(score, score, maxRawScore, maxRawScore);
-
-                        return true;
-                    }
+                        return ScoreModel.MaxRawScoreForNumberOfNotes(difficultyData.beatmapData.cuttableNotesType);
                 }
             }
 
-            calculatedRank = default;
-            return false;
+            return -1;
         }
 
         [UIAction("completed-formatter")]
