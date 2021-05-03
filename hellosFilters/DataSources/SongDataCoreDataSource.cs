@@ -119,17 +119,17 @@ namespace HUIFilters.DataSources
             Plugin.Log.Info("Processing data from SongDataCore");
             Stopwatch sw = Stopwatch.StartNew();
 
-            const int WorkLimit = 100;
-            int limit = WorkLimit;
+            const int WorkTimeLimitMilliseconds = 5;
+            Stopwatch workLimitStopwatch = Stopwatch.StartNew();
             foreach (var (hash, song) in SDCPlugin.Songs.Data.Songs)
             {
                 var beatmapCharacteristics = new Dictionary<string, Dictionary<BeatmapDifficulty, BeatmapMetaData.DifficultyData>>();
                 var scoreSabercharacteristics = new Dictionary<string, Dictionary<BeatmapDifficulty, ScoreSaberData.DifficultyData>>();
 
-                if ((--limit) < 0)
+                if (workLimitStopwatch.ElapsedMilliseconds > WorkTimeLimitMilliseconds)
                 {
                     await Task.Yield();
-                    limit = WorkLimit;
+                    workLimitStopwatch.Restart();
                 }
 
                 foreach (var (characteristic, difficultiesData) in song.characteristics)
@@ -160,6 +160,7 @@ namespace HUIFilters.DataSources
                 _beatSaverData.Add(hash, new BeatSaverData(song.downloadCount, song.upVotes, song.downVotes, song.heat, song.rating));
             }
 
+            workLimitStopwatch.Stop();
             sw.Stop();
             Plugin.Log.Info($"Finished processing data from SongDataCore in {sw.ElapsedMilliseconds}ms");
         }
