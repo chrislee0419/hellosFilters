@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Zenject;
-using SongCore;
 using BeatSaberMarkupLanguage.Attributes;
 using HUI.Utilities;
 using HUIFilters.DataSources;

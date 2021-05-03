@@ -383,7 +383,7 @@ namespace HUIFilters.Filters.BuiltIn
                 CharacteristicSerializedName = characteristic.serializedName;
             }
 
-            public void InvokeRequiredPropertyChanged() => this.CallAndHandleAction(PropertyChanged, nameof(RequiredStagingValue));
+            internal void InvokeRequiredPropertyChanged() => this.CallAndHandleAction(PropertyChanged, nameof(RequiredStagingValue));
         }
     }
 }
