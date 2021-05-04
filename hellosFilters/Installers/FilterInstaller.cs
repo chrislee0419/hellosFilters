@@ -15,6 +15,7 @@ namespace HUIFilters.Installers
             Container.BindInterfacesAndSelfTo<CharacteristicFilter>().AsSingle();
             Container.BindInterfacesAndSelfTo<DurationFilter>().AsSingle();
             Container.BindInterfacesAndSelfTo<PlayerStatsFilter>().AsSingle();
+            Container.BindInterfacesAndSelfTo<ModRequirementsFilter>().AsSingle();
 
             var externalFilters = InstallerUtilities.GetAutoInstallDerivativeTypesFromAllAssemblies(typeof(IFilter));
             foreach (var type in externalFilters)

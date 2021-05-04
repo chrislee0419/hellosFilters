@@ -1,0 +1,57 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
+    id='root'
+    anchor-min-x='0' anchor-min-y='0'
+    anchor-max-x='1' anchor-max-y='1'
+    anchor-pos-x='0' anchor-pos-y='0'
+    size-delta-x='0' size-delta-y='0'>
+  <vertical active='~is-loading'
+            anchor-min-x='0' anchor-min-y='0'
+            anchor-max-x='1' anchor-max-y='1'
+            anchor-pos-x='0' anchor-pos-y='0'
+            size-delta-x='0' size-delta-y='0'
+            vertical-fit='Unconstrained'
+            child-align='MiddleCenter'>
+    <text text='Loading song data...'
+          font-align='Center'
+          font-size='3.2'
+          italics='true' />
+  </vertical>
+  
+  <bg active='~is-not-loading'
+      anchor-min-x='0' anchor-min-y='0'
+      anchor-max-x='1' anchor-max-y='1'
+      anchor-pos-x='0' anchor-pos-y='0'
+      size-delta-x='0' size-delta-y='0'>
+    <scroll-view anchor-min-x='0' anchor-min-y='0'
+                 anchor-max-x='1' anchor-max-y='1'
+                 anchor-pos-x='0' anchor-pos-y='0'
+                 size-delta-x='0' size-delta-y='0'
+                 pad='1'>
+      <horizontal preferred-width='80'
+                  bg='round-rect-panel'
+                  bg-color='#00000060'
+                  pad='2'>
+        <text text='Find or remove beatmaps that require mods to play. This filter cannot find maps for mods you don&apos;t have.'
+              font-size='2.6'
+              word-wrapping='true'
+              italics='true' />
+      </horizontal>
+
+      <vertical preferred-width='80'
+                child-control-height='false'
+                child-expand-height='false'
+                child-expand-width='false'
+                vertical-fit='PreferredSize'>
+        <macro.for-each items='capabilities-list'>
+          <list-setting text='~capability-text'
+                        value='required-value'
+                        options='required-options'
+                        bind-value='true'
+                        apply-on-change='true'
+                        formatter='required-formatter' />
+        </macro.for-each>
+      </vertical>
+    </scroll-view>
+  </bg>
+</bg>
