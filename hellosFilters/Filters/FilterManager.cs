@@ -103,6 +103,8 @@ namespace HUIFilters.Filters
         {
             foreach (var filter in _filters)
                 filter.ApplyDefaultValues();
+
+            this.CallAndHandleAction(LevelCollectionRefreshRequested, nameof(LevelCollectionRefreshRequested), false);
         }
 
         private void OnWidgetFilterButtonPressed()
