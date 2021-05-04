@@ -254,7 +254,11 @@ namespace HUIFilters.UI.Screens
             // do not show screen during activation
         }
 
-        public void ShowScreen() => this._animationHandler.PlayRevealAnimation();
+        public void ShowScreen()
+        {
+            _currentFilter.ShowView(_settingsContainer);
+            this._animationHandler.PlayRevealAnimation();
+        }
 
         public void HideScreen() => this._animationHandler.PlayConcealAnimation();
 
