@@ -18,6 +18,8 @@ namespace HUIFilters.Filters
         private FilterWidgetScreenManager _filterWidgetScreenManager;
         private FilterSettingsScreenManager _filterSettingsScreenManager;
 
+        private bool _availabilityChangedThisFrame = false;
+
         private List<IFilter> _filters;
 
         [Inject]
@@ -43,6 +45,9 @@ namespace HUIFilters.Filters
             _filterSettingsScreenManager.FilterUnapplied += UnapplyFilters;
             _filterSettingsScreenManager.FilterReset += OnFilterSettingsFilterReset;
             _filterSettingsScreenManager.FilterCleared += OnFilterSettingsFilterCleared;
+
+            foreach (var filter in _filters)
+                filter.AvailabilityChanged += OnFilterAvailabilityChanged;
         }
 
         public void Dispose()
@@ -59,6 +64,15 @@ namespace HUIFilters.Filters
                 _filterSettingsScreenManager.FilterUnapplied -= UnapplyFilters;
                 _filterSettingsScreenManager.FilterReset -= OnFilterSettingsFilterReset;
                 _filterSettingsScreenManager.FilterCleared -= OnFilterSettingsFilterCleared;
+            }
+
+            if (_filters != null)
+            {
+                foreach (var filter in _filters)
+                {
+                    if (filter != null)
+                        filter.AvailabilityChanged -= OnFilterAvailabilityChanged;
+                }
             }
         }
 
@@ -133,6 +147,18 @@ namespace HUIFilters.Filters
         {
             foreach (var filter in _filters)
                 filter.SetDefaultValuesToStaging();
+        }
+
+        private void OnFilterAvailabilityChanged()
+        {
+            if (!_availabilityChangedThisFrame)
+            {
+                CoroutineUtilities.StartDelayedAction(delegate ()
+                {
+                    _availabilityChangedThisFrame = false;
+                    _filterSettingsScreenManager.UpdateFiltersDropdownList();
+                });
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ namespace HUIFilters.Filters
 {
     public interface IFilter
     {
+        event Action AvailabilityChanged;
         event Action SettingChanged;
 
         string Name { get; }
@@ -41,6 +42,7 @@ namespace HUIFilters.Filters
     /// </summary>
     public abstract class BSMLViewFilterBase : IFilter
     {
+        public event Action AvailabilityChanged;
         public event Action SettingChanged;
 
         public abstract string Name { get; }
@@ -54,6 +56,7 @@ namespace HUIFilters.Filters
         [UIObject("root")]
         protected GameObject _viewGO;
 
+        protected void InvokeAvailabilityChanged() => this.CallAndHandleAction(AvailabilityChanged, nameof(AvailabilityChanged));
         protected void InvokeSettingChanged() => this.CallAndHandleAction(SettingChanged, nameof(SettingChanged));
 
         public virtual void ShowView(GameObject parentGO)

@@ -168,6 +168,7 @@ namespace HUIFilters.UI.Screens
             rt.sizeDelta = new Vector2(40f, 0f);
 
             _filtersDropdown.SetTexts(_filters.Select(x => x.Name).ToList());
+            UpdateFiltersDropdownList();
 
             _filtersDropdown.didSelectCellWithIdxEvent += OnFilterDropdownListCellSelected;
 
@@ -261,6 +262,19 @@ namespace HUIFilters.UI.Screens
         }
 
         public void HideScreen() => this._animationHandler.PlayConcealAnimation();
+
+        public void UpdateFiltersDropdownList()
+        {
+            string IFilterToText(IFilter filter)
+            {
+                if (filter.IsAvailable)
+                    return filter.Name.EscapeTextMeshProTags();
+                else
+                    return $"<color=#FF0000>*</color> <i>{filter.Name.EscapeTextMeshProTags()}</i>";
+            }
+
+            _filtersDropdown.SetTexts(_filters.Select(IFilterToText).ToList());
+        }
 
         private void UpdateStatusImageColour()
         {
