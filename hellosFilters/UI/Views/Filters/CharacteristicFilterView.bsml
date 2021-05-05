@@ -60,27 +60,21 @@
               font-color='#AAAAAA' />
       </horizontal>
 
-      <macro.if value='data-source-available'>
-        <horizontal bg='round-rect-panel'
-                    bg-color='#00000060'
-                    pad='2'>
-          <text text='The "Lightshow" filter will also accept maps that have no notes on any characteristic.'
-                font-size='2.6'
-                word-wrapping='true'
-                italics='true' />
-        </horizontal>
-      </macro.if>
+      <horizontal active='~data-source-available'
+                  bg='round-rect-panel'
+                  bg-color='#00000060'
+                  pad='2'>
+        <text text='The "Lightshow" filter will also accept levels that have no notes in any characteristic.'
+              font-size='2.6'
+              word-wrapping='true'
+              italics='true' />
+      </horizontal>
+
       <toggle-setting text='Lightshow'
                       value='lightshow-value'
                       bind-value='true'
                       apply-on-change='true' />
-    </vertical>
 
-    <vertical preferred-width='80'
-              child-control-height='false'
-              child-expand-height='false'
-              child-expand-width='false'
-              vertical-fit='PreferredSize'>
       <macro.for-each items='custom-characteristics-list'>
         <toggle-setting text='~characteristic-name'
                         value='required-value'

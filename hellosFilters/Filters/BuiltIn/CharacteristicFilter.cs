@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 using SongCore;
 using BeatSaberMarkupLanguage.Attributes;
@@ -10,7 +12,7 @@ using HUIFilters.DataSources;
 
 namespace HUIFilters.Filters.BuiltIn
 {
-    public class CharacteristicFilter : NotifiableBSMLViewFilterBase, IInitializable
+    public class CharacteristicFilter : NotifiableBSMLViewFilterBase, IInitializable, IDisposable
     {
         public override string Name => "Characteristics";
         public override bool IsAvailable => true;
@@ -156,6 +158,14 @@ namespace HUIFilters.Filters.BuiltIn
                         characteristic.InvokeRequiredPropertyChanged();
                 };
             }
+
+            _beatmapDataSource.AvailabilityChanged += OnBeatmapDataSourceAvailabilityChanged;
+        }
+
+        public void Dispose()
+        {
+            if (_beatmapDataSource != null)
+                _beatmapDataSource.AvailabilityChanged -= OnBeatmapDataSourceAvailabilityChanged;
         }
 
         protected override void InternalSetDefaultValuesToStaging()
@@ -349,6 +359,27 @@ namespace HUIFilters.Filters.BuiltIn
                 level is CustomPreviewBeatmapLevel customLevel &&
                 _beatmapDataSource.BeatmapData.TryGetValue(BeatmapUtilities.GetCustomLevelHash(customLevel), out var metadata) &&
                 metadata.Characteristics.Values.Any(x => x.Values.Any(y => y.NoteCount == 0));
+        }
+
+        private void OnBeatmapDataSourceAvailabilityChanged()
+        {
+            InvokePropertyChanged(nameof(DataSourceAvailable));
+
+            if (_viewGO != null && _viewGO.activeInHierarchy)
+            {
+                // for whatever reason, if the lightshow text box gets activated
+                // it really doesn't like to be positioned correctly and needs to be rebuilt twice
+                // still a very meh fix, since it causes the view to be messed up 1 frame
+                CoroutineUtilities.StartDelayedAction(delegate ()
+                {
+                    var rt = _viewGO.transform
+                        .Find("BSMLScrollView/Viewport/BSMLScrollViewContent")
+                        .GetComponent<RectTransform>();
+
+                    LayoutRebuilder.MarkLayoutForRebuild(rt);
+                    CoroutineUtilities.StartDelayedAction(() => LayoutRebuilder.MarkLayoutForRebuild(rt));
+                });
+            }
         }
 
         public class CustomCharacteristic : INotifyPropertyChanged
