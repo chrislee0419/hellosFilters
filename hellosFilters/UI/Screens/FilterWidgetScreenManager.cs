@@ -141,12 +141,16 @@ namespace HUIFilters.UI.Screens
         [UIAction("filter-button-clicked")]
         private void OnFilterButtonClicked()
         {
+            Plugin.Log.DebugOnly("Filter button clicked");
+
             this.CallAndHandleAction(FilterButtonPressed, nameof(FilterButtonPressed));
         }
 
         [UIAction("cancel-filter-button-clicked")]
         private void OnCancelFilterButtonClicked()
         {
+            Plugin.Log.DebugOnly("Cancel filter button clicked");
+
             this.CallAndHandleAction(CancelFilterButtonPressed, nameof(CancelFilterButtonPressed));
         }
     }

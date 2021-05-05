@@ -316,7 +316,7 @@ namespace HUIFilters.UI.Screens
             this.NotifyPropertyChanged(nameof(FilterStatusText));
         }
 
-        private void UpdateFilterStatus()
+        public void UpdateFilterStatus()
         {
             IsApplied = _filters.Any(x => x.IsApplied);
             HasChanges = _filters.Any(x => x.HasChanges);
@@ -343,8 +343,6 @@ namespace HUIFilters.UI.Screens
             Plugin.Log.DebugOnly("Apply filters button clicked");
 
             this.CallAndHandleAction(FilterApplied, nameof(FilterApplied));
-
-            UpdateFilterStatus();
         }
 
         [UIAction("unapply-button-clicked")]
@@ -353,8 +351,6 @@ namespace HUIFilters.UI.Screens
             Plugin.Log.DebugOnly("Unapply filters button clicked");
 
             this.CallAndHandleAction(FilterUnapplied, nameof(FilterUnapplied));
-
-            UpdateFilterStatus();
         }
 
         [UIAction("save-settings-button-clicked")]
@@ -369,8 +365,6 @@ namespace HUIFilters.UI.Screens
             Plugin.Log.DebugOnly("Reset filters button clicked");
 
             this.CallAndHandleAction(FilterReset, nameof(FilterReset));
-
-            UpdateFilterStatus();
         }
 
         [UIAction("clear-button-clicked")]
@@ -379,8 +373,6 @@ namespace HUIFilters.UI.Screens
             Plugin.Log.DebugOnly("Clear filters button clicked");
 
             this.CallAndHandleAction(FilterCleared, nameof(FilterCleared));
-
-            UpdateFilterStatus();
         }
     }
 }

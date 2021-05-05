@@ -118,6 +118,9 @@ namespace HUIFilters.Filters
             foreach (var filter in _filters)
                 filter.ApplyDefaultValues();
 
+            _filterWidgetScreenManager.FilterApplied = false;
+            _filterSettingsScreenManager.UpdateFilterStatus();
+
             this.CallAndHandleAction(LevelCollectionRefreshRequested, nameof(LevelCollectionRefreshRequested), false);
         }
 
@@ -134,6 +137,9 @@ namespace HUIFilters.Filters
             foreach (var filter in _filters)
                 filter.ApplyStagingValues();
 
+            _filterWidgetScreenManager.FilterApplied = true;
+            _filterSettingsScreenManager.UpdateFilterStatus();
+
             this.CallAndHandleAction(LevelCollectionRefreshRequested, nameof(LevelCollectionRefreshRequested), false);
         }
 
@@ -141,12 +147,16 @@ namespace HUIFilters.Filters
         {
             foreach (var filter in _filters)
                 filter.SetAppliedValuesToStaging();
+
+            _filterSettingsScreenManager.UpdateFilterStatus();
         }
 
         private void OnFilterSettingsFilterCleared()
         {
             foreach (var filter in _filters)
                 filter.SetDefaultValuesToStaging();
+
+            _filterSettingsScreenManager.UpdateFilterStatus();
         }
 
         private void OnFilterAvailabilityChanged()
