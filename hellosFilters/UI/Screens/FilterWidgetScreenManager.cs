@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using HMUI;
 using VRUIControls;
-using BS_Utils.Utilities;
 using BeatSaberMarkupLanguage.Attributes;
 using HUI.Attributes;
 using HUI.UI.Components;
@@ -82,9 +81,9 @@ namespace HUIFilters.UI.Screens
             this._animationHandler.UsePointerAnimations = false;
 
             if (NotAppliedFilterSprite == null)
-                NotAppliedFilterSprite = UIUtilities.LoadSpriteFromResources("HUIFilters.Assets.filter.png");
+                NotAppliedFilterSprite = BSMLUtilities.FindSpriteInAssembly("hellosFilters:HUIFilters.Assets.filter.png");
             if (AppliedFilterSprite == null)
-                AppliedFilterSprite = UIUtilities.LoadSpriteFromResources("HUIFilters.Assets.appliedfilter.png");
+                AppliedFilterSprite = BSMLUtilities.FindSpriteInAssembly("hellosFilters:HUIFilters.Assets.appliedfilter.png");
 
             Object.Destroy(_filterButton.GetComponent<ContentSizeFitter>());
             Object.Destroy(_cancelFilterButton.GetComponent<ContentSizeFitter>());
