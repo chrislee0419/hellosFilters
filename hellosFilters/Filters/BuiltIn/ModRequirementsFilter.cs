@@ -211,7 +211,7 @@ namespace HUIFilters.Filters.BuiltIn
 
         private void OnSongCoreLoaderFinishedLoading(Loader loader, ConcurrentDictionary<string, CustomPreviewBeatmapLevel> customLevels)
         {
-            if (_viewGO.activeInHierarchy)
+            if (_viewGO?.activeInHierarchy ?? false)
                 LoadExtraSongData();
         }
 
