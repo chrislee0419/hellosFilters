@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using Zenject;
 using VRUIControls;
 using HMUI;
@@ -149,11 +150,30 @@ namespace HUIFilters.UI.Screens
             GameObject.Destroy(_filtersDropdown.GetComponent<NoteJumpStartBeatOffsetDropdown>());
 
             // fix stuff
-            DropdownWithTableView dropdown = _filtersDropdown as DropdownWithTableView;
-            GameObjectUtilities.FixRaycaster(FieldAccessor<DropdownWithTableView, TableView>.Get(ref dropdown, "_tableView").gameObject, physicsRaycaster);
+            var dropdown = _filtersDropdown as DropdownWithTableView;
+            var dropdownTableView = FieldAccessor<DropdownWithTableView, TableView>.Get(ref dropdown, "_tableView");
+            GameObjectUtilities.FixRaycaster(dropdownTableView.gameObject, physicsRaycaster);
 
             ModalView dropdownModalView = dropdown.transform.Find("DropdownTableView").GetComponent<ModalView>();
             FieldAccessor<ModalView, DiContainer>.Set(ref dropdownModalView, "_container", container);
+
+            // enable formatting tags
+            var preallocatedCells = FieldAccessor<TableView, TableView.CellsGroup[]>.Get(ref dropdownTableView, "_preallocatedCells");
+            var cellTextAccessor = FieldAccessor<SimpleTextTableCell, TextMeshProUGUI>.GetAccessor("_text");
+            foreach (var cellsGroup in preallocatedCells)
+            {
+                foreach (var cell in cellsGroup.cells)
+                {
+                    var simpleTextTableCell = cell as SimpleTextTableCell;
+                    cellTextAccessor(ref simpleTextTableCell).richText = true;
+                }
+            }
+
+            var cellPrefab = FieldAccessor<SimpleTextDropdown, SimpleTextTableCell>.Get(ref _filtersDropdown, "_cellPrefab");
+            cellTextAccessor(ref cellPrefab).richText = true;
+
+            var dropdownText = FieldAccessor<SimpleTextDropdown, TextMeshProUGUI>.Get(ref _filtersDropdown, "_text");
+            dropdownText.richText = true;
 
             var rt = dropdownModalView.transform as RectTransform;
             rt.anchorMin = new Vector2(rt.anchorMin.x, 1f);
