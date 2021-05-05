@@ -128,9 +128,7 @@ namespace HUIFilters.Filters.BuiltIn
         [UIValue("max-setting-interactable")]
         public bool MaxSettingInteractable => _maxEnabledStagingValue;
 
-        [UIValue("min-setting-max-value")]
         public int MinSettingMaxValue => _maxEnabledStagingValue ? _maxStagingValue - IncrementValue : MaximumValue;
-        [UIValue("max-setting-min-value")]
         public int MaxSettingMinValue => _minEnabledStagingValue ? _minStagingValue + IncrementValue : MinimumValue;
 
         protected override string AssociatedBSMLFile => "HUIFilters.UI.Views.Filters.DurationFilterView.bsml";
@@ -152,9 +150,9 @@ namespace HUIFilters.Filters.BuiltIn
 
         [UIValue("inc-value")]
         private const int IncrementValue = 15;
-        [UIValue("min-setting-min-value")]
+        [UIValue("setting-min-value")]
         private const int MinimumValue = IncrementValue;
-        [UIValue("max-setting-max-value")]
+        [UIValue("setting-max-value")]
         private const int MaximumValue = 60 * 60;
 
         protected override void InternalSetDefaultValuesToStaging()

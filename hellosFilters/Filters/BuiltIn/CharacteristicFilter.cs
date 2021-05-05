@@ -12,7 +12,7 @@ using HUIFilters.DataSources;
 
 namespace HUIFilters.Filters.BuiltIn
 {
-    public class CharacteristicFilter : NotifiableBSMLViewFilterBase, IInitializable, IDisposable
+    public sealed class CharacteristicFilter : NotifiableBSMLViewFilterBase, IInitializable, IDisposable
     {
         public override string Name => "Characteristics";
         public override bool IsAvailable => true;

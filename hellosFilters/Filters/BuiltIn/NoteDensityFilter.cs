@@ -138,9 +138,7 @@ namespace HUIFilters.Filters.BuiltIn
         [UIValue("max-setting-interactable")]
         public bool MaxSettingInteractable => _maxEnabledStagingValue;
 
-        [UIValue("min-setting-max-value")]
         public float MinSettingMaxValue => _maxEnabledStagingValue ? _maxStagingValue - IncrementValue : MaximumValue;
-        [UIValue("max-setting-min-value")]
         public float MaxSettingMinValue => _minEnabledStagingValue ? _minStagingValue + IncrementValue : MinimumValue;
 
         protected override string AssociatedBSMLFile => "HUIFilters.UI.Views.Filters.NoteDensityFilterView.bsml";
@@ -164,9 +162,9 @@ namespace HUIFilters.Filters.BuiltIn
 
         [UIValue("inc-value")]
         private const float IncrementValue = 0.5f;
-        [UIValue("min-setting-min-value")]
+        [UIValue("setting-min-value")]
         private const float MinimumValue = IncrementValue;
-        [UIValue("max-setting-max-value")]
+        [UIValue("setting-max-value")]
         private const float MaximumValue = 30f;
 
         [Inject]
