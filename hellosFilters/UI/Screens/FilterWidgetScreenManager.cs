@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using HMUI;
 using VRUIControls;
 using BeatSaberMarkupLanguage.Attributes;
@@ -28,19 +29,19 @@ namespace HUIFilters.UI.Screens
             {
                 if (value)
                 {
+                    _filterText.text = "<i>Applied</i>";
                     _filterIcon.sprite = AppliedFilterSprite;
 
-                    _filterButtonAnimations.NormalIconColour = new Color(0.5f, 0.475f, 0.45f);
                     _filterButtonAnimations.HighlightedBGColour = FilterAppliedHighlightedBGColour;
                     _filterButtonAnimations.PressedBGColour = FilterAppliedHighlightedBGColour;
 
-                    _cancelFilterButtonAnimations.NormalBGColour = new Color(1f, 0.375f, 0f, 0.5f);
+                    _cancelFilterButtonAnimations.NormalBGColour = new Color(1f, 0.125f, 0f, 0.5f);
                 }
                 else
                 {
+                    _filterText.text = "Filter";
                     _filterIcon.sprite = NotAppliedFilterSprite;
 
-                    _filterButtonAnimations.NormalIconColour = new Color(0.5f, 0.5f, 0.5f);
                     _filterButtonAnimations.HighlightedBGColour = FilterNotAppliedHighlightedBGColour;
                     _filterButtonAnimations.PressedBGColour = FilterNotAppliedHighlightedBGColour;
 
@@ -57,6 +58,7 @@ namespace HUIFilters.UI.Screens
 #pragma warning restore CS0649
 
         private Image _filterIcon;
+        private TextMeshProUGUI _filterText;
 
         private CustomIconButtonAnimations _filterButtonAnimations;
         private CustomIconButtonAnimations _cancelFilterButtonAnimations;
@@ -65,8 +67,8 @@ namespace HUIFilters.UI.Screens
         private static Sprite AppliedFilterSprite;
 
         private static readonly Color FilterNotAppliedHighlightedBGColour = new Color(0.145f, 0.443f, 1f);
-        private static readonly Color FilterAppliedHighlightedBGColour = new Color(1f, 0.375f, 0f, 0.5f);
-        private static readonly Color CancelFilterHighlightedBGColour = new Color(1f, 0f, 0f, 0.5f);
+        private static readonly Color FilterAppliedHighlightedBGColour = new Color(0f, 0.875f, 0f);
+        private static readonly Color CancelFilterHighlightedBGColour = new Color(1f, 0f, 0f, 0.75f);
 
         public FilterWidgetScreenManager(
             MainMenuViewController mainMenuVC,
@@ -98,6 +100,8 @@ namespace HUIFilters.UI.Screens
             var container = _filterButton.transform.Find("Content");
             Object.DestroyImmediate(container.GetComponent<StackLayoutGroup>());
 
+            _filterText = container.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+
             var hlg = container.gameObject.AddComponent<HorizontalLayoutGroup>();
             hlg.childAlignment = TextAnchor.MiddleLeft;
             hlg.spacing = 2f;
@@ -111,7 +115,7 @@ namespace HUIFilters.UI.Screens
             layoutElement.minWidth = 3f;
             layoutElement.preferredWidth = 4f;
 
-            layoutElement = _filterButton.transform.Find("Content/Text").gameObject.AddComponent<LayoutElement>();
+            layoutElement = _filterText.gameObject.AddComponent<LayoutElement>();
             layoutElement.preferredWidth = 30f;
 
             _filterIcon.transform.SetParent(container, false);

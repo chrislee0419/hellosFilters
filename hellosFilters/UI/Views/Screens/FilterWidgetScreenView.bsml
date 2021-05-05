@@ -10,7 +10,6 @@
           anchor-max-x='1' anchor-max-y='1'
           size-delta-x='-11' size-delta-y='0'
           anchor-pos-x='-5.5' anchor-pos-y='0'
-          text='Filter'
           on-click='filter-button-clicked' />
   <icon-button id='cancel-filter-button'
                icon='hellosUI:HUI.Assets.cross.png'
