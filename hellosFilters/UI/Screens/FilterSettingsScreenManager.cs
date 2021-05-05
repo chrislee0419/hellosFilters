@@ -290,7 +290,7 @@ namespace HUIFilters.UI.Screens
                 if (filter.IsAvailable)
                     return filter.Name.EscapeTextMeshProTags();
                 else
-                    return $"<color=#FF0000>*</color> <i>{filter.Name.EscapeTextMeshProTags()}</i>";
+                    return $"<color=#FF4444>* {filter.Name.EscapeTextMeshProTags()} *</color>";
             }
 
             _filtersDropdown.SetTexts(_filters.Select(IFilterToText).ToList());
