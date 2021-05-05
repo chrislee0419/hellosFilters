@@ -15,6 +15,8 @@ namespace HUIFilters.DataSources
 {
     internal class SongDataCoreDataSource : IInitializable, IDisposable, IBeatmapDataSource, IScoreSaberDataSource, IBeatSaverDataSource
     {
+        public event Action AvailabilityChanged;
+
         public bool IsDataAvailable => !_isProcessingData && (_beatmapData.Count > 0 || _scoreSaberData.Count > 0 || _beatSaverData.Count > 0);
 
         private Dictionary<string, BeatmapMetaData> _beatmapData = new Dictionary<string, BeatmapMetaData>(StringComparer.InvariantCultureIgnoreCase);
@@ -96,6 +98,8 @@ namespace HUIFilters.DataSources
             _beatmapData.Clear();
             _scoreSaberData.Clear();
             _beatSaverData.Clear();
+
+            this.CallAndHandleAction(AvailabilityChanged, nameof(AvailabilityChanged));
         }
 
         private void OnSongDataCoreFinishedProcessing()
@@ -141,6 +145,8 @@ namespace HUIFilters.DataSources
 
             sw.Stop();
             Plugin.Log.Info($"Finished processing data from SongDataCore in {sw.ElapsedMilliseconds}ms");
+
+            this.CallAndHandleAction(AvailabilityChanged, nameof(AvailabilityChanged));
         }
 
         private void ProcessDataThread(object state)

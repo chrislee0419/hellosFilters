@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using HUIFilters.DataSources.DataTypes;
 
@@ -6,6 +7,10 @@ namespace HUIFilters.DataSources
 {
     internal class EmptyDataSource : IBeatmapDataSource, IScoreSaberDataSource, IBeatSaverDataSource
     {
+#pragma warning disable CS0067
+        public event Action AvailabilityChanged;
+#pragma warning restore CS0067
+
         public bool IsDataAvailable => false;
 
         private ReadOnlyDictionary<string, BeatmapMetaData> _beatmapData = new ReadOnlyDictionary<string, BeatmapMetaData>(new Dictionary<string, BeatmapMetaData>(0));

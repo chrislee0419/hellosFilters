@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using HUIFilters.DataSources.DataTypes;
 
 namespace HUIFilters.DataSources
 {
     public interface IDataSource
     {
+        event Action AvailabilityChanged;
+
         bool IsDataAvailable { get; }
     }
 
