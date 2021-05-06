@@ -160,6 +160,7 @@
     <Compile Include="Filters\BuiltIn\NoteDensityFilter.cs" />
     <Compile Include="Filters\BuiltIn\PlayerStatsFilter.cs" />
     <Compile Include="Filters\BuiltIn\PPFilter.cs" />
+    <Compile Include="Filters\BuiltIn\StarRatingFilter.cs" />
     <Compile Include="Filters\FilterManager.cs" />
     <Compile Include="Filters\IFilter.cs" />
     <Compile Include="Filters\SavedFilterSettings.cs" />
@@ -188,6 +189,7 @@
     <EmbeddedResource Include="UI\Views\Filters\ModRequirementsFilterView.bsml" />
     <EmbeddedResource Include="UI\Views\Filters\NoteDensityFilterView.bsml" />
     <EmbeddedResource Include="UI\Views\Filters\PPFilterView.bsml" />
+    <EmbeddedResource Include="UI\Views\Filters\StarRatingFilterView.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
