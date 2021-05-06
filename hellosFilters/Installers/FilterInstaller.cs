@@ -15,6 +15,7 @@ namespace HUIFilters.Installers
             Container.BindInterfacesAndSelfTo<CharacteristicFilter>().AsSingle();
             Container.BindInterfacesAndSelfTo<NoteDensityFilter>().AsSingle();
             Container.BindInterfacesAndSelfTo<DurationFilter>().AsSingle();
+            Container.BindInterfacesAndSelfTo<PPFilter>().AsSingle();
             Container.BindInterfacesAndSelfTo<PlayerStatsFilter>().AsSingle();
             Container.BindInterfacesAndSelfTo<ModRequirementsFilter>().AsSingle();
 
