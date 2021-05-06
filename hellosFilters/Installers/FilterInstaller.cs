@@ -11,14 +11,14 @@ namespace HUIFilters.Installers
         {
             Container.BindInterfacesAndSelfTo<FilterManager>().AsSingle();
 
-            Container.BindInterfacesAndSelfTo<DifficultyFilter>().AsSingle();
             Container.BindInterfacesAndSelfTo<CharacteristicFilter>().AsSingle();
-            Container.BindInterfacesAndSelfTo<NoteDensityFilter>().AsSingle();
+            Container.BindInterfacesAndSelfTo<DifficultyFilter>().AsSingle();
             Container.BindInterfacesAndSelfTo<DurationFilter>().AsSingle();
+            Container.BindInterfacesAndSelfTo<ModRequirementsFilter>().AsSingle();
+            Container.BindInterfacesAndSelfTo<NoteDensityFilter>().AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerStatsFilter>().AsSingle();
             Container.BindInterfacesAndSelfTo<PPFilter>().AsSingle();
             Container.BindInterfacesAndSelfTo<StarRatingFilter>().AsSingle();
-            Container.BindInterfacesAndSelfTo<PlayerStatsFilter>().AsSingle();
-            Container.BindInterfacesAndSelfTo<ModRequirementsFilter>().AsSingle();
 
             var externalFilters = InstallerUtilities.GetAutoInstallDerivativeTypesFromAllAssemblies(typeof(IFilter));
             foreach (var type in externalFilters)

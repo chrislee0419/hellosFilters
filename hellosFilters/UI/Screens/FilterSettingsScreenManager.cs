@@ -137,7 +137,8 @@ namespace HUIFilters.UI.Screens
             this._animationHandler.UsePointerAnimations = false;
             this._animationHandler.LocalScale = 0.025f;
 
-            _filters = filters;
+            _filters = new List<IFilter>(filters);
+            SortFilterList();
 
             // dropdown button
             var playerSettingsPanelController = FieldAccessor<GameplaySetupViewController, PlayerSettingsPanelController>.Get(ref gameplaySetupViewController, "_playerSettingsPanelController");
@@ -186,9 +187,6 @@ namespace HUIFilters.UI.Screens
             rt.pivot = new Vector2(0f, 0.5f);
             rt.anchoredPosition = Vector2.zero;
             rt.sizeDelta = new Vector2(40f, 0f);
-
-            _filtersDropdown.SetTexts(_filters.Select(x => x.Name).ToList());
-            UpdateFiltersDropdownList();
 
             _filtersDropdown.didSelectCellWithIdxEvent += OnFilterDropdownListCellSelected;
 
@@ -251,9 +249,9 @@ namespace HUIFilters.UI.Screens
             foreach (var filter in _filters)
                 filter.SettingChanged += UpdateFilterStatus;
 
-            _filtersDropdown.SelectCellWithIdx(0);
             _currentFilter = _filters[0];
-            _currentFilter.ShowView(_settingsContainer);
+
+            UpdateFiltersDropdownList();
         }
 
         public override void Dispose()
@@ -293,7 +291,31 @@ namespace HUIFilters.UI.Screens
                     return $"<color=#FF4444>* {filter.Name.EscapeTextMeshProTags()} *</color>";
             }
 
+            SortFilterList();
+
             _filtersDropdown.SetTexts(_filters.Select(IFilterToText).ToList());
+            _filtersDropdown.SelectCellWithIdx(_filters.IndexOf(_currentFilter));
+        }
+
+        public void UpdateFilterStatus()
+        {
+            IsApplied = _filters.Any(x => x.IsApplied);
+            HasChanges = _filters.Any(x => x.HasChanges);
+        }
+
+        private void SortFilterList()
+        {
+            int FilterComparator(IFilter x, IFilter y)
+            {
+                if (x.IsAvailable == y.IsAvailable)
+                    return string.Compare(x.Name, y.Name, true);
+                else if (x.IsAvailable)
+                    return -1;
+                else
+                    return 1;
+            }
+
+            _filters.Sort(FilterComparator);
         }
 
         private void UpdateStatusImageColour()
@@ -314,12 +336,6 @@ namespace HUIFilters.UI.Screens
             this.NotifyPropertyChanged(nameof(ApplyButtonInteractable));
 
             this.NotifyPropertyChanged(nameof(FilterStatusText));
-        }
-
-        public void UpdateFilterStatus()
-        {
-            IsApplied = _filters.Any(x => x.IsApplied);
-            HasChanges = _filters.Any(x => x.HasChanges);
         }
 
         private void OnFilterDropdownListCellSelected(DropdownWithTableView dropdown, int index)
