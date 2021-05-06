@@ -163,6 +163,8 @@ namespace HUIFilters.Filters
         {
             if (!_availabilityChangedThisFrame)
             {
+                _availabilityChangedThisFrame = true;
+
                 CoroutineUtilities.StartDelayedAction(delegate ()
                 {
                     _availabilityChangedThisFrame = false;
