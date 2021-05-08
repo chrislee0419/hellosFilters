@@ -39,7 +39,7 @@ namespace HUIFilters.Filters
             // TODO: load saved filters
 
             _filterWidgetScreenManager.FilterButtonPressed += OnWidgetFilterButtonPressed;
-            _filterWidgetScreenManager.CancelFilterButtonPressed += UnapplyFilters;
+            _filterWidgetScreenManager.CancelFilterButtonPressed += OnWidgetCancelFilterButtonPressed;
 
             _filterSettingsScreenManager.FilterApplied += OnFilterSettingsFilterApplied;
             _filterSettingsScreenManager.FilterUnapplied += UnapplyFilters;
@@ -55,7 +55,7 @@ namespace HUIFilters.Filters
             if (_filterWidgetScreenManager != null)
             {
                 _filterWidgetScreenManager.FilterButtonPressed += OnWidgetFilterButtonPressed;
-                _filterWidgetScreenManager.CancelFilterButtonPressed += UnapplyFilters;
+                _filterWidgetScreenManager.CancelFilterButtonPressed += OnWidgetCancelFilterButtonPressed;
             }
 
             if (_filterSettingsScreenManager != null)
@@ -130,6 +130,12 @@ namespace HUIFilters.Filters
                 _filterSettingsScreenManager.HideScreen();
             else
                 _filterSettingsScreenManager.ShowScreen();
+        }
+
+        private void OnWidgetCancelFilterButtonPressed()
+        {
+            if (_filters.Any(x => x.IsApplied))
+                UnapplyFilters();
         }
 
         private void OnFilterSettingsFilterApplied()
