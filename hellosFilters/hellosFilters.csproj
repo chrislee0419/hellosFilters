@@ -199,7 +199,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\savedfilter.png" />
+    <EmbeddedResource Include="Assets\savedfilterslist.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\appliedfilter.png" />
