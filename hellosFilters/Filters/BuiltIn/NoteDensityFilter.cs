@@ -308,9 +308,17 @@ namespace HUIFilters.Filters.BuiltIn
             InvokeAvailabilityChanged();
         }
 
-        private void UpdateMinSettingIncrementButtonInteractable() => _minSetting.EnableInc = _minStagingValue < MinSettingMaxValue;
+        private void UpdateMinSettingIncrementButtonInteractable()
+        {
+            if (_minSetting != null)
+                _minSetting.EnableInc = _minStagingValue < MinSettingMaxValue;
+        }
 
-        private void UpdateMaxSettingDecrementButtonInteractable() => _maxSetting.EnableDec = _maxStagingValue > MaxSettingMinValue;
+        private void UpdateMaxSettingDecrementButtonInteractable()
+        {
+            if (_maxSetting != null)
+                _maxSetting.EnableDec = _maxStagingValue > MaxSettingMinValue;
+        }
 
         [UIAction("note-density-formatter")]
         private string NoteDensityFormatter(float density) => density.ToString("0.0 'NPS'");
