@@ -6,6 +6,7 @@ using Zenject;
 using HUI.Interfaces;
 using HUI.Utilities;
 using HUIFilters.UI.Screens;
+using HUIFilters.Utilities;
 
 namespace HUIFilters.Filters
 {
@@ -16,6 +17,7 @@ namespace HUIFilters.Filters
         public int Priority => 0;
 
         private FilterWidgetScreenManager _filterWidgetScreenManager;
+        private SavedFilterSettingsListScreenManager _savedFilterSettingsListScreenManager;
         private FilterSettingsScreenManager _filterSettingsScreenManager;
 
         private bool _availabilityChangedThisFrame = false;
@@ -25,10 +27,12 @@ namespace HUIFilters.Filters
         [Inject]
         public FilterManager(
             FilterWidgetScreenManager filterWidgetScreenManager,
+            SavedFilterSettingsListScreenManager savedFilterSettingsListScreenManager,
             FilterSettingsScreenManager filterSettingsScreenManager,
             List<IFilter> filters)
         {
             _filterWidgetScreenManager = filterWidgetScreenManager;
+            _savedFilterSettingsListScreenManager = savedFilterSettingsListScreenManager;
             _filterSettingsScreenManager = filterSettingsScreenManager;
 
             _filters = filters;
@@ -36,12 +40,13 @@ namespace HUIFilters.Filters
 
         public void Initialize()
         {
-            // TODO: load saved filters
-
             _filterWidgetScreenManager.FilterButtonPressed += OnWidgetFilterButtonPressed;
+            _filterWidgetScreenManager.SavedFilterSettingsListButtonPressed += OnWidgetSavedFilterSettingsListButtonPressed;
             _filterWidgetScreenManager.CancelFilterButtonPressed += OnWidgetCancelFilterButtonPressed;
 
-            _filterSettingsScreenManager.FilterApplied += OnFilterSettingsFilterApplied;
+            _savedFilterSettingsListScreenManager.SavedFilterSettingsApplied += OnSavedFilterSettingsApplied;
+
+            _filterSettingsScreenManager.FilterApplied += ApplyFilters;
             _filterSettingsScreenManager.FilterUnapplied += UnapplyFilters;
             _filterSettingsScreenManager.FilterReset += OnFilterSettingsFilterReset;
             _filterSettingsScreenManager.FilterCleared += OnFilterSettingsFilterCleared;
@@ -55,12 +60,16 @@ namespace HUIFilters.Filters
             if (_filterWidgetScreenManager != null)
             {
                 _filterWidgetScreenManager.FilterButtonPressed += OnWidgetFilterButtonPressed;
+                _filterWidgetScreenManager.SavedFilterSettingsListButtonPressed -= OnWidgetSavedFilterSettingsListButtonPressed;
                 _filterWidgetScreenManager.CancelFilterButtonPressed += OnWidgetCancelFilterButtonPressed;
             }
 
+            if (_savedFilterSettingsListScreenManager != null)
+                _savedFilterSettingsListScreenManager.SavedFilterSettingsApplied -= OnSavedFilterSettingsApplied;
+
             if (_filterSettingsScreenManager != null)
             {
-                _filterSettingsScreenManager.FilterApplied -= OnFilterSettingsFilterApplied;
+                _filterSettingsScreenManager.FilterApplied -= ApplyFilters;
                 _filterSettingsScreenManager.FilterUnapplied -= UnapplyFilters;
                 _filterSettingsScreenManager.FilterReset -= OnFilterSettingsFilterReset;
                 _filterSettingsScreenManager.FilterCleared -= OnFilterSettingsFilterCleared;
@@ -113,6 +122,17 @@ namespace HUIFilters.Filters
             return true;
         }
 
+        private void ApplyFilters()
+        {
+            foreach (var filter in _filters)
+                filter.ApplyStagingValues();
+
+            _filterWidgetScreenManager.FilterApplied = true;
+            _filterSettingsScreenManager.UpdateFilterStatus();
+
+            this.CallAndHandleAction(LevelCollectionRefreshRequested, nameof(LevelCollectionRefreshRequested), false);
+        }
+
         private void UnapplyFilters()
         {
             foreach (var filter in _filters)
@@ -132,21 +152,31 @@ namespace HUIFilters.Filters
                 _filterSettingsScreenManager.ShowScreen();
         }
 
+        private void OnWidgetSavedFilterSettingsListButtonPressed()
+        {
+            if (_savedFilterSettingsListScreenManager.IsVisible)
+                _savedFilterSettingsListScreenManager.HideScreen();
+            else
+                _savedFilterSettingsListScreenManager.ShowScreen();
+        }
+
         private void OnWidgetCancelFilterButtonPressed()
         {
             if (_filters.Any(x => x.IsApplied))
                 UnapplyFilters();
         }
 
-        private void OnFilterSettingsFilterApplied()
+        private void OnSavedFilterSettingsApplied(SavedFilterSettings savedSettings)
         {
             foreach (var filter in _filters)
-                filter.ApplyStagingValues();
+            {
+                filter.SetDefaultValuesToStaging();
 
-            _filterWidgetScreenManager.FilterApplied = true;
-            _filterSettingsScreenManager.UpdateFilterStatus();
+                if (savedSettings.FilterSettings.TryGetValue(filter.GetIdentifier(), out var settings))
+                    filter.SetSavedValuesToStaging(settings);
+            }
 
-            this.CallAndHandleAction(LevelCollectionRefreshRequested, nameof(LevelCollectionRefreshRequested), false);
+            ApplyFilters();
         }
 
         private void OnFilterSettingsFilterReset()

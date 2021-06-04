@@ -18,6 +18,7 @@ namespace HUIFilters.UI.Screens
     public class FilterWidgetScreenManager : ModifiableScreenManagerBase
     {
         public event Action FilterButtonPressed;
+        public event Action SavedFilterSettingsListButtonPressed;
         public event Action CancelFilterButtonPressed;
 
         public override string ScreenName => "Filter Widget";
@@ -167,6 +168,8 @@ namespace HUIFilters.UI.Screens
         private void OnSavedFilterSettingsListButtonClicked()
         {
             Plugin.Log.DebugOnly("Saved filter settings list button clicked");
+
+            this.CallAndHandleAction(SavedFilterSettingsListButtonPressed, nameof(SavedFilterSettingsListButtonPressed));
         }
 
         [UIAction("cancel-filter-button-clicked")]

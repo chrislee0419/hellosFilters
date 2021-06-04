@@ -9,17 +9,36 @@
       bg-color='#80808040'
       anchor-min-x='0' anchor-min-y='0'
       anchor-max-x='1' anchor-max-y='1'
-      anchor-pos-x='0' anchor-pos-y='7'
-      pivot-x='0.5' pivot-y='0'
-      size-delta-x='-2' size-delta-y='-16'>
-    <list id='saved-filter-settings-list'
-          anchor-min-x='0' anchor-min-y='0'
-          anchor-max-x='1' anchor-max-y='1'
-          size-delta-x='0' size-delta-y='0'
-          cell-size='7'
-          list-style='Simple'
-          align-to-center='true'
-          select-cell='saved-filter-settings-list-cell-selected' />
+      anchor-pos-x='0' anchor-pos-y='-8'
+      pivot-x='0.5' pivot-y='1'
+      size-delta-x='-2' size-delta-y='-24.5'>
+    <text active='~empty-list-text-active'
+          text='No saved filter settings available'
+          anchor-min-x='0' anchor-min-y='0.5'
+          anchor-max-x='1' anchor-max-y='0.5'
+          size-delta-x='-4' size-delta-y='0'
+          font-align='Center'
+          font-color='#FFFFFF80'
+          italics='true'
+          word-wrapping='true' />
+    <hui-custom-list id='saved-filter-settings-list'
+                     anchor-min-x='0' anchor-min-y='0'
+                     anchor-max-x='1' anchor-max-y='1'
+                     size-delta-x='0' size-delta-y='0'
+                     cell-size='7'
+                     clickable-cells='true'
+                     select-cell='saved-filter-settings-list-cell-selected'>
+      <scrolling-text text='~name-text'
+                      anchor-min-x='0' anchor-min-y='0'
+                      anchor-max-x='1' anchor-max-y='1'
+                      size-delta-x='-2' size-delta-y='0'
+                      font-size='3.4'
+                      font-align='Center'
+                      movement-type='ByDuration'
+                      animation-type='ForwardAndReverse'
+                      pause-duration='3'
+                      scroll-duration='4' />
+    </hui-custom-list>
   </bg>
   
   <icon-button id='page-up-button'
@@ -29,13 +48,32 @@
                anchor-pos-x='0' anchor-pos-y='-1'
                pivot-x='0.5' pivot-y='1'
                size-delta-x='-14' size-delta-y='7'
-               click-event='sort-mode-list#PageUp' />
+               click-event='saved-filter-settings-list#PageUp' />
   <icon-button id='page-down-button'
                icon='hellosUI:HUI.Assets.chevron.png'
                anchor-min-x='0' anchor-min-y='0'
                anchor-max-x='1' anchor-max-y='0'
-               anchor-pos-x='0' anchor-pos-y='1'
+               anchor-pos-x='0' anchor-pos-y='9.5'
                pivot-x='0.5' pivot-y='0'
                size-delta-x='-14' size-delta-y='7'
-               click-event='sort-mode-list#PageDown' />
+               click-event='saved-filter-settings-list#PageDown' />
+
+  <horizontal id='bottom-buttons-container'
+              anchor-min-x='0' anchor-min-y='0'
+              anchor-max-x='1' anchor-max-y='0'
+              anchor-pos-x='0' anchor-pos-y='1'
+              pivot-x='0.5' pivot-y='0'
+              size-delta-x='-6' size-delta-y='8.5'
+              spacing='4'>
+    <icon-button id='settings-button'
+                 icon='hellosUI:HUI.Assets.settings.png'
+                 preferred-width='10'
+                 on-click='settings-button-clicked' />
+    <button id='apply-button'
+            interactable='~apply-button-interactable'
+            text='Apply'
+            preferred-width='32'
+            preferred-height='9'
+            on-click='apply-button-clicked' />
+  </horizontal>
 </bg>
