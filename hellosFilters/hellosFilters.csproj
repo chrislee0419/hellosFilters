@@ -147,6 +147,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\ExceptionRecoverableListConverter.cs" />
+    <Compile Include="Converters\SavedFilterSettingsConverter.cs" />
     <Compile Include="DataSources\DataTypes\BeatmapMetaData.cs" />
     <Compile Include="DataSources\DataTypes\BeatSaverData.cs" />
     <Compile Include="DataSources\DataTypes\ScoreSaberData.cs" />
