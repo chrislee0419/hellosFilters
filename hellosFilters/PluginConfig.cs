@@ -1,5 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using IPA.Config.Stores;
+using IPA.Config.Stores.Attributes;
+using HUIFilters.Converters;
+using HUIFilters.Filters;
 
 [assembly: InternalsVisibleTo(GeneratedStore.AssemblyVisibilityTarget)]
 namespace HUIFilters
@@ -7,6 +11,10 @@ namespace HUIFilters
     internal class PluginConfig
     {
         public static PluginConfig Instance { get; set; }
+
+        [NonNullable]
+        [UseConverter(typeof(ExceptionRecoverableListConverter<SavedFilterSettings, SavedFilterSettingsConverter>))]
+        public virtual List<SavedFilterSettings> SavedFilterSettings { get; set; } = new List<SavedFilterSettings>();
 
         ///// <summary>
         ///// This is called whenever BSIPA reads the config from disk (including when file changes are detected).
