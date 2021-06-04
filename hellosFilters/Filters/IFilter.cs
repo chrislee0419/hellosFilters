@@ -16,6 +16,14 @@ namespace HUIFilters.Filters
         event Action AvailabilityChanged;
         event Action SettingChanged;
 
+        /// <summary>
+        /// The name of this filter.
+        /// 
+        /// <para>
+        /// NOTE: The name provided must satisfy the <see cref="System.Text.RegularExpressions.Regex"/>
+        /// found at <see cref="SavedFilterSettings.AllowedCharactersRegex"/>.
+        /// </para>
+        /// </summary>
         string Name { get; }
         bool IsAvailable { get; }
 
@@ -33,6 +41,16 @@ namespace HUIFilters.Filters
 
         void FilterLevels(ref List<IPreviewBeatmapLevel> levels);
 
+        /// <summary>
+        /// Get the currently applied settings in a format that can be serialized to be stored in the config.
+        /// 
+        /// <para>
+        /// NOTE: As with the <see cref="Name"/> property, the keys and values stored in the returned
+        /// <see cref="IDictionary{string, string}"/> must satisfy the <see cref="System.Text.RegularExpressions.Regex"/>
+        /// found at <see cref="SavedFilterSettings.AllowedCharactersRegex"/>.
+        /// </para>
+        /// </summary>
+        /// <returns>A <see cref="IDictionary{string, string}"/> that maps a setting's name to its associated value.</returns>
         IDictionary<string, string> GetAppliedSettings();
     }
 
