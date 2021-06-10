@@ -11,7 +11,7 @@ namespace HUIFilters.Filters
         public string Name { get; private set; }
         public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> FilterSettings { get; private set; }
 
-        public static readonly Regex AllowedCharactersRegex = new Regex("^[A-za-z0-9_.,+\\-*'\" ]+$");
+        public static readonly Regex AllowedCharactersRegex = new Regex("^[A-za-z0-9_.,!?+\\-*/=<>()'\" ]+$");
 
         internal SavedFilterSettings(string name, List<IFilter> filters)
         {

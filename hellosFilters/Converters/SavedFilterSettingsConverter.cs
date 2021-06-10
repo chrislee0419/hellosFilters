@@ -13,7 +13,7 @@ namespace HUIFilters.Converters
         public const char FilterSeparator = '|';
         public const char SettingsStartIdentifier = '{';
         public const char SettingsEndIdentifier = '}';
-        public const char SettingsSeparator = '/';
+        public const char SettingsSeparator = '\\';
         public const char KeyValueSeparator = ':';
 
         private const string NameKey = "Name";
