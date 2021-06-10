@@ -94,6 +94,19 @@
             pivot-x='0' pivot-y='0.5'
             size-delta-x='20' size-delta-y='0'
             on-click='save-settings-button-clicked' />
+
+    <horizontal anchor-min-x='0' anchor-min-y='0'
+                anchor-max-x='0' anchor-max-y='1'
+                anchor-pos-x='45' anchor-pos-y='0'
+                pivot-x='0' pivot-y='0.5'
+                size-delta-x='19' size-delta-y='0'
+                horizontal-fit='Unconstrained'
+                vertical-fit='Unconstrained'>
+    <text id='save-settings-text'
+          active='false'
+          font-size='2.6'
+          font-align='Center' />
+    </horizontal>
     
     <button id='reset-button'
             text='Reset'

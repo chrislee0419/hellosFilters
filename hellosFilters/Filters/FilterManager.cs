@@ -50,6 +50,8 @@ namespace HUIFilters.Filters
             _filterSettingsScreenManager.FilterUnapplied += UnapplyFilters;
             _filterSettingsScreenManager.FilterReset += OnFilterSettingsFilterReset;
             _filterSettingsScreenManager.FilterCleared += OnFilterSettingsFilterCleared;
+            _filterSettingsScreenManager.SavedSettingsCreated += OnFilterSettingsSavedSettingsCreated;
+            _filterSettingsScreenManager.SavedSettingsOverwritten += OnFilterSettingsSavedSettingsOverwritten;
 
             foreach (var filter in _filters)
                 filter.AvailabilityChanged += OnFilterAvailabilityChanged;
@@ -73,6 +75,8 @@ namespace HUIFilters.Filters
                 _filterSettingsScreenManager.FilterUnapplied -= UnapplyFilters;
                 _filterSettingsScreenManager.FilterReset -= OnFilterSettingsFilterReset;
                 _filterSettingsScreenManager.FilterCleared -= OnFilterSettingsFilterCleared;
+                _filterSettingsScreenManager.SavedSettingsCreated -= OnFilterSettingsSavedSettingsCreated;
+                _filterSettingsScreenManager.SavedSettingsOverwritten -= OnFilterSettingsSavedSettingsOverwritten;
             }
 
             if (_filters != null)
@@ -193,6 +197,31 @@ namespace HUIFilters.Filters
                 filter.SetDefaultValuesToStaging();
 
             _filterSettingsScreenManager.UpdateFilterStatus();
+        }
+
+        private void OnFilterSettingsSavedSettingsCreated(string name)
+        {
+            PluginConfig.Instance.SavedFilterSettings.Add(new SavedFilterSettings(name, _filters));
+            OnSavedFilterSettingsListChanged();
+        }
+
+        private void OnFilterSettingsSavedSettingsOverwritten(SavedFilterSettings savedSettings)
+        {
+            if (!PluginConfig.Instance.SavedFilterSettings.Contains(savedSettings))
+            {
+                Plugin.Log.Warn("Trying to overwrite a SavedFilterSettings object that isn't found in the PluginConfig instance");
+            }
+
+            savedSettings.SetFilterSettings(_filters);
+            OnSavedFilterSettingsListChanged();
+        }
+
+        private void OnSavedFilterSettingsListChanged()
+        {
+            PluginConfig.Instance.Changed();
+
+            _savedFilterSettingsListScreenManager.RefreshSavedFilterSettingsList();
+            // TODO: update saved filter settings list in settings modal
         }
 
         private void OnFilterAvailabilityChanged()

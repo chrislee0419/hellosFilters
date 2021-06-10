@@ -1,0 +1,176 @@
+﻿<vertical xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
+          id='root'
+          anchor-min-x='0' anchor-min-y='0'
+          anchor-max-x='1' anchor-max-y='1'
+          anchor-pos-x='0' anchor-pos-y='0'
+          size-delta-x='0' size-delta-y='0'>
+  
+  <vertical active='~intro-view-active'
+            child-control-height='false'
+            child-expand-height='false'
+            child-expand-width='false'
+            preferred-width='90'
+            vertical-fit='PreferredSize'
+            spacing='1'
+            pad='1'>
+    <horizontal bg='round-rect-panel'
+                bg-color='#00000060'
+                pad='2'>
+      <text text='Store the currently applied settings with a name to quickly reapply the same settings at a later time.'
+            font-size='3'
+            word-wrapping='true'
+            italics='true' />
+    </horizontal>
+    <horizontal bg='round-rect-panel'
+                bg-color='#00000060'
+                pad='2'>
+      <text id='applied-filters-list-text'
+            font-size='2.8'
+            word-wrapping='true' />
+    </horizontal>
+    <horizontal spacing='2' pad='2'>
+      <button text='Create New'
+              font-size='3.2'
+              on-click='create-new-button-clicked' />
+      <button text='Overwrite Existing'
+              font-size='3.2'
+              on-click='overwrite-existing-button-clicked' />
+    </horizontal>
+  </vertical>
+
+  <vertical active='~new-saved-settings-view-active'
+            child-expand-width='false'
+            child-align='UpperCenter'
+            preferred-width='90'
+            pad-top='0' pad-bottom='2' pad-left='1' pad-right='1'>
+    <horizontal spacing='1'>
+      <horizontal>
+        <text text='Create a new slot to store the Saved Settings.'
+              font-size='2.6' />
+      </horizontal>
+      <horizontal spacing='1'>
+        <button text='Back'
+                font-size='3.2'
+                pad='0'
+                on-click='back-button-clicked' />
+        <button text='Save Settings'
+                interactable='~new-save-button-interactable'
+                font-size='3.6'
+                pad='0'
+                on-click='new-save-button-clicked' />
+      </horizontal>
+    </horizontal>
+    <horizontal child-align='UpperCenter'
+                vertical-fit='PreferredSize'
+                preferred-height='8'
+                pad-bottom='2'>
+      <horizontal child-align='MiddleLeft'
+                  horizontal-fit='Unconstrained'
+                  vertical-fit='PreferredSize'
+                  preferred-width='22'>
+        <horizontal active='~error-text-box-active'
+                    bg='round-rect-panel'
+                    bg-color='#00000060'
+                    pad='2'>
+          <text id='new-error-text'
+                font-size='2.6'
+                word-wrapping='true' />
+        </horizontal>
+      </horizontal>
+      <horizontal child-align='MiddleCenter'
+                  horizontal-fit='Unconstrained'
+                  preferred-width='36'>
+        <text text='~save-settings-name-value'
+              font-size='3.6'
+              font-align='Center'
+              overflow-mode='Overflow' />
+      </horizontal>
+      <horizontal preferred-width='22' />
+    </horizontal>
+    <bg id='keyboard-container' />
+  </vertical>
+
+  <vertical active='~overwrite-saved-settings-view-active'
+            vertical-fit='PreferredSize'
+            preferred-width='90'
+            spacing='2'
+            pad='1'>
+    <horizontal>
+      <text text='Select an existing Saved Settings slot to overwrite.'
+            font-size='2.6' />
+    </horizontal>
+    
+    <horizontal>
+      <horizontal preferred-width='48'
+                  spacing='1'>
+        <vertical preferred-width='40'>
+          <hui-custom-list id='overwrite-list'
+                           list-width='40'
+                           cell-size='6'
+                           visible-cells='5.5'
+                           select-cell='overwrite-list-cell-selected'>
+            <scrolling-text text='~name-text'
+                            anchor-min-x='0' anchor-min-y='0'
+                            anchor-max-x='1' anchor-max-y='1'
+                            size-delta-x='-2' size-delta-y='0'
+                            font-size='3.2'
+                            font-align='Center'
+                            italics='true'
+                            movement-type='ByDuration'
+                            animation-type='ForwardAndReverse'
+                            pause-duration='3'
+                            scroll-duration='4' />
+          </hui-custom-list>
+        </vertical>
+        <vertical preferred-width='8'>
+          <vertical child-align='UpperCenter'
+                    child-expand-height='false'>
+            <icon-button id='overwrite-list-page-up-button'
+                         icon='hellosUI:HUI.Assets.chevron.png'
+                         preferred-width='6'
+                         preferred-height='12'
+                         click-event='overwrite-list#PageUp'/>
+          </vertical>
+          <vertical child-align='LowerCenter'
+                    child-expand-height='false'>
+            <icon-button id='overwrite-list-page-down-button'
+                         icon='hellosUI:HUI.Assets.chevron.png'
+                         preferred-width='6'
+                         preferred-height='12'
+                         click-event='overwrite-list#PageDown'/>
+          </vertical>
+        </vertical>
+      </horizontal>
+      <vertical preferred-width='38'>
+        <horizontal child-align='UpperCenter'
+                    preferred-height='10'
+                    pad='2'>
+          <button interactable='~overwrite-save-button-interactable'
+                  text='Overwrite Settings'
+                  font-size='3.8'
+                  pad='2'
+                  on-click='overwrite-save-button-clicked' />
+        </horizontal>
+        <horizontal preferred-height='14'>
+          <horizontal active='~error-text-box-active'
+                      bg='round-rect-panel'
+                      bg-color='#00000060'
+                      pad='2'>
+            <text id='overwrite-error-text'
+                  font-size='2.6'
+                  word-wrapping='true' />
+          </horizontal>
+        </horizontal>
+        <vertical child-align='LowerCenter'
+                  preferred-height='10'
+                  pad='2'>
+          <button text='Back'
+                  font-size='3.2'
+                  pad='2'
+                  on-click='back-button-clicked' />
+        </vertical>
+      </vertical>
+    </horizontal>
+  </vertical>
+</vertical>

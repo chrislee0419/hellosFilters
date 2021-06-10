@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -19,12 +20,14 @@ using HUIFilters.Filters;
 namespace HUIFilters.UI.Screens
 {
     [AutoInstall]
-    public class FilterSettingsScreenManager : ModifiableScreenManagerBase
+    public partial class FilterSettingsScreenManager : ModifiableScreenManagerBase
     {
         public event Action FilterApplied;
         public event Action FilterUnapplied;
         public event Action FilterReset;
         public event Action FilterCleared;
+        public event Action<string> SavedSettingsCreated;
+        public event Action<SavedFilterSettings> SavedSettingsOverwritten;
 
         public override string ScreenName => "Filter Settings";
         protected override string AssociatedBSMLResource => "HUIFilters.UI.Views.Screens.FilterSettingsScreenView.bsml";
@@ -107,14 +110,23 @@ namespace HUIFilters.UI.Screens
         [UIObject("clear-button")]
         private GameObject _clearButton;
 
+        [UIComponent("save-settings-text")]
+        private TextMeshProUGUI _saveSettingsText;
+
         [UIObject("settings-container")]
         private GameObject _settingsContainer;
 #pragma warning restore CS0649
+
+        private DiContainer _container;
 
         private List<IFilter> _filters;
         private IFilter _currentFilter;
 
         private SimpleTextDropdown _filtersDropdown;
+        private TextMeshProUGUI _filtersDropdownText;
+        private TableView _filtersDropdownTableView;
+
+        private SaveSettingsViewController _saveSettingsViewController;
 
         private const string NotAppliedStatusText = "NOT APPLIED";
         private const string NotAppliedWithChangesStatusText = "<i>NOT APPLIED (*)</i>";
@@ -137,8 +149,12 @@ namespace HUIFilters.UI.Screens
             this._animationHandler.UsePointerAnimations = false;
             this._animationHandler.LocalScale = 0.025f;
 
+            _container = container;
+
             _filters = new List<IFilter>(filters);
             SortFilterList();
+
+            _saveSettingsText.text = "";
 
             // dropdown button
             var playerSettingsPanelController = FieldAccessor<GameplaySetupViewController, PlayerSettingsPanelController>.Get(ref gameplaySetupViewController, "_playerSettingsPanelController");
@@ -150,16 +166,18 @@ namespace HUIFilters.UI.Screens
 
             GameObject.Destroy(_filtersDropdown.GetComponent<NoteJumpStartBeatOffsetDropdown>());
 
+            _filtersDropdownText = FieldAccessor<SimpleTextDropdown, TextMeshProUGUI>.Get(ref _filtersDropdown, "_text");
+
             // fix stuff
             var dropdown = _filtersDropdown as DropdownWithTableView;
-            var dropdownTableView = FieldAccessor<DropdownWithTableView, TableView>.Get(ref dropdown, "_tableView");
-            GameObjectUtilities.FixRaycaster(dropdownTableView.gameObject, physicsRaycaster);
+            _filtersDropdownTableView = FieldAccessor<DropdownWithTableView, TableView>.Get(ref dropdown, "_tableView");
+            GameObjectUtilities.FixRaycaster(_filtersDropdownTableView.gameObject, physicsRaycaster);
 
             ModalView dropdownModalView = dropdown.transform.Find("DropdownTableView").GetComponent<ModalView>();
             FieldAccessor<ModalView, DiContainer>.Set(ref dropdownModalView, "_container", container);
 
             // enable formatting tags
-            var preallocatedCells = FieldAccessor<TableView, TableView.CellsGroup[]>.Get(ref dropdownTableView, "_preallocatedCells");
+            var preallocatedCells = FieldAccessor<TableView, TableView.CellsGroup[]>.Get(ref _filtersDropdownTableView, "_preallocatedCells");
             var cellTextAccessor = FieldAccessor<SimpleTextTableCell, TextMeshProUGUI>.GetAccessor("_text");
             foreach (var cellsGroup in preallocatedCells)
             {
@@ -275,7 +293,12 @@ namespace HUIFilters.UI.Screens
 
         public void ShowScreen()
         {
-            _currentFilter.ShowView(_settingsContainer);
+            if (_currentFilter != null)
+                _currentFilter.ShowView(_settingsContainer);
+
+            _saveSettingsText.text = "";
+            _saveSettingsText.gameObject.SetActive(false);
+
             this._animationHandler.PlayRevealAnimation();
         }
 
@@ -294,7 +317,11 @@ namespace HUIFilters.UI.Screens
             SortFilterList();
 
             _filtersDropdown.SetTexts(_filters.Select(IFilterToText).ToList());
-            _filtersDropdown.SelectCellWithIdx(_filters.IndexOf(_currentFilter));
+
+            if (_currentFilter != null)
+                _filtersDropdown.SelectCellWithIdx(_filters.IndexOf(_currentFilter));
+            else if (_saveSettingsViewController?.IsVisible ?? false)
+                _filtersDropdownText.text = "Save Settings";
         }
 
         public void UpdateFilterStatus()
@@ -345,7 +372,12 @@ namespace HUIFilters.UI.Screens
             if (_currentFilter == _filters[index])
                 return;
 
-            _currentFilter.HideView();
+            if (_saveSettingsViewController != null)
+                _saveSettingsViewController.HideView();
+
+            if (_currentFilter != null)
+                _currentFilter.HideView();
+
             _currentFilter = _filters[index];
             _currentFilter.ShowView(_settingsContainer);
         }
@@ -372,7 +404,23 @@ namespace HUIFilters.UI.Screens
         [UIAction("save-settings-button-clicked")]
         private void OnSaveSettingsButtonClicked()
         {
-            Plugin.Log.Notice("save settings button clicked");
+            Plugin.Log.DebugOnly("Save settings button clicked");
+
+            _filtersDropdownText.text = "Save Settings";
+            _filtersDropdownTableView.ClearSelection();
+
+            if (_currentFilter != null)
+                _currentFilter.HideView();
+            _currentFilter = null;
+
+            if (_saveSettingsViewController == null)
+            {
+                _saveSettingsViewController = new SaveSettingsViewController(this, _settingsContainer);
+                _saveSettingsViewController.SavedSettingsCreated += OnSavedSettingsCreated;
+                _saveSettingsViewController.SavedSettingsOverwritten += OnSavedSettingsOverwritten;
+            }
+
+            _saveSettingsViewController.ShowView();
         }
 
         [UIAction("reset-button-clicked")]
@@ -389,6 +437,54 @@ namespace HUIFilters.UI.Screens
             Plugin.Log.DebugOnly("Clear filters button clicked");
 
             this.CallAndHandleAction(FilterCleared, nameof(FilterCleared));
+        }
+
+        private void OnSavedSettingsCreated(string name)
+        {
+            HandleSettingsSaved("Settings saved");
+            SavedSettingsCreated?.Invoke(name);
+        }
+
+        private void OnSavedSettingsOverwritten(SavedFilterSettings savedSettings)
+        {
+            HandleSettingsSaved("Settings overwritten");
+            SavedSettingsOverwritten?.Invoke(savedSettings);
+        }
+
+        private void HandleSettingsSaved(string message)
+        {
+            _saveSettingsViewController.HideView();
+
+            _currentFilter = _filters[0];
+            _currentFilter.ShowView(_settingsContainer);
+            _filtersDropdown.SelectCellWithIdx(0);
+
+            _saveSettingsText.text = message;
+            _saveSettingsText.gameObject.SetActive(true);
+            CoroutineUtilities.Start(SaveSettingsTextAnimationCoroutine());
+        }
+
+        private IEnumerator SaveSettingsTextAnimationCoroutine()
+        {
+            _saveSettingsText.color = new Color(0.75f, 0.75f, 0.75f, 1f);
+
+            yield return new WaitForSeconds(4f);
+
+            float time = 0f;
+            Color textColour = _saveSettingsText.color;
+            while (textColour.a > 0f && _saveSettingsText.gameObject.activeInHierarchy)
+            {
+                textColour.a = Mathf.Lerp(1f, 0f, time);
+                _saveSettingsText.color = textColour;
+
+                time += Time.deltaTime;
+
+                yield return null;
+            }
+
+            _saveSettingsText.text = "";
+            _saveSettingsText.color = Color.clear;
+            _saveSettingsText.gameObject.SetActive(false);
         }
     }
 }

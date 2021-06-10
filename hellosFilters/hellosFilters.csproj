@@ -171,6 +171,8 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\Components\SaveSettingsKeyboard.cs" />
+    <Compile Include="UI\Screens\FilterSettingsScreenManager.SaveSettingsViewController.cs" />
     <Compile Include="UI\Screens\SavedFilterSettingsListScreenManager.cs" />
     <Compile Include="UI\Screens\FilterSettingsScreenManager.cs" />
     <Compile Include="UI\Screens\FilterWidgetScreenManager.cs" />
@@ -192,6 +194,7 @@
     <EmbeddedResource Include="UI\Views\Filters\NoteDensityFilterView.bsml" />
     <EmbeddedResource Include="UI\Views\Filters\PPFilterView.bsml" />
     <EmbeddedResource Include="UI\Views\Filters\StarRatingFilterView.bsml" />
+    <EmbeddedResource Include="UI\Views\SaveSettingsView.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
