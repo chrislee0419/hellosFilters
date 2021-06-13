@@ -28,16 +28,16 @@
                      cell-size='7'
                      clickable-cells='true'
                      select-cell='saved-filter-settings-list-cell-selected'>
-      <scrolling-text text='~name-text'
-                      anchor-min-x='0' anchor-min-y='0'
-                      anchor-max-x='1' anchor-max-y='1'
-                      size-delta-x='-2' size-delta-y='0'
-                      font-size='3.4'
-                      font-align='Center'
-                      movement-type='ByDuration'
-                      animation-type='ForwardAndReverse'
-                      pause-duration='3'
-                      scroll-duration='4' />
+      <hui-scrolling-text text='~name-text'
+                          anchor-min-x='0' anchor-min-y='0'
+                          anchor-max-x='1' anchor-max-y='1'
+                          size-delta-x='-2' size-delta-y='0'
+                          font-size='3.4'
+                          font-align='Center'
+                          movement-type='ByDuration'
+                          animation-type='ForwardAndReverse'
+                          pause-duration='3'
+                          scroll-duration='4' />
     </hui-custom-list>
   </bg>
   
