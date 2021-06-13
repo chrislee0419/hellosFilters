@@ -176,6 +176,7 @@
     <Compile Include="UI\Screens\SavedFilterSettingsListScreenManager.cs" />
     <Compile Include="UI\Screens\FilterSettingsScreenManager.cs" />
     <Compile Include="UI\Screens\FilterWidgetScreenManager.cs" />
+    <Compile Include="UI\Settings\FilterSettingsTab.cs" />
     <Compile Include="Utilities\FilterUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +196,7 @@
     <EmbeddedResource Include="UI\Views\Filters\PPFilterView.bsml" />
     <EmbeddedResource Include="UI\Views\Filters\StarRatingFilterView.bsml" />
     <EmbeddedResource Include="UI\Views\SaveSettingsView.bsml" />
+    <EmbeddedResource Include="UI\Views\FilterSettingsView.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
