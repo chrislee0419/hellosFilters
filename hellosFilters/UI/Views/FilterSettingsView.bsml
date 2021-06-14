@@ -53,7 +53,7 @@
                      icon='hellosUI:HUI.Assets.chevron.png'
                      preferred-width='6'
                      preferred-height='12'
-                     click-event='save-settings-list#PageUp' />
+                     click-event='saved-settings-list#PageUp' />
       </vertical>
       <vertical child-align='LowerCenter'
                 child-expand-height='false'>
@@ -61,7 +61,7 @@
                      icon='hellosUI:HUI.Assets.chevron.png'
                      preferred-width='6'
                      preferred-height='12'
-                     click-event='save-settings-list#PageDown' />
+                     click-event='saved-settings-list#PageDown' />
       </vertical>
     </vertical>
 
