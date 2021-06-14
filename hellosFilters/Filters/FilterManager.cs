@@ -6,6 +6,7 @@ using Zenject;
 using HUI.Interfaces;
 using HUI.Utilities;
 using HUIFilters.UI.Screens;
+using HUIFilters.UI.Settings;
 using HUIFilters.Utilities;
 
 namespace HUIFilters.Filters
@@ -19,6 +20,7 @@ namespace HUIFilters.Filters
         private FilterWidgetScreenManager _filterWidgetScreenManager;
         private SavedFilterSettingsListScreenManager _savedFilterSettingsListScreenManager;
         private FilterSettingsScreenManager _filterSettingsScreenManager;
+        private FilterSettingsTab _filterSettingsTab;
 
         private bool _availabilityChangedThisFrame = false;
 
@@ -29,11 +31,13 @@ namespace HUIFilters.Filters
             FilterWidgetScreenManager filterWidgetScreenManager,
             SavedFilterSettingsListScreenManager savedFilterSettingsListScreenManager,
             FilterSettingsScreenManager filterSettingsScreenManager,
+            FilterSettingsTab filterSettingsTab,
             List<IFilter> filters)
         {
             _filterWidgetScreenManager = filterWidgetScreenManager;
             _savedFilterSettingsListScreenManager = savedFilterSettingsListScreenManager;
             _filterSettingsScreenManager = filterSettingsScreenManager;
+            _filterSettingsTab = filterSettingsTab;
 
             _filters = filters;
         }
@@ -52,6 +56,8 @@ namespace HUIFilters.Filters
             _filterSettingsScreenManager.FilterCleared += OnFilterSettingsFilterCleared;
             _filterSettingsScreenManager.SavedSettingsCreated += OnFilterSettingsSavedSettingsCreated;
             _filterSettingsScreenManager.SavedSettingsOverwritten += OnFilterSettingsSavedSettingsOverwritten;
+
+            _filterSettingsTab.SavedFilterSettingsListChanged += OnSavedFilterSettingsListChanged;
 
             foreach (var filter in _filters)
                 filter.AvailabilityChanged += OnFilterAvailabilityChanged;
@@ -78,6 +84,9 @@ namespace HUIFilters.Filters
                 _filterSettingsScreenManager.SavedSettingsCreated -= OnFilterSettingsSavedSettingsCreated;
                 _filterSettingsScreenManager.SavedSettingsOverwritten -= OnFilterSettingsSavedSettingsOverwritten;
             }
+
+            if (_filterSettingsTab != null)
+                _filterSettingsTab.SavedFilterSettingsListChanged -= OnSavedFilterSettingsListChanged;
 
             if (_filters != null)
             {
@@ -221,7 +230,7 @@ namespace HUIFilters.Filters
             PluginConfig.Instance.Changed();
 
             _savedFilterSettingsListScreenManager.RefreshSavedFilterSettingsList();
-            // TODO: update saved filter settings list in settings modal
+            _filterSettingsTab.RefreshSavedFilterSettingsList();
         }
 
         private void OnFilterAvailabilityChanged()
