@@ -8,6 +8,7 @@ using UnityEngine;
 using HMUI;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
+using HUI.Attributes;
 using HUI.Interfaces;
 using HUI.UI.Components;
 using HUI.UI.CustomBSML.Components;
@@ -16,6 +17,7 @@ using HUIFilters.Filters;
 
 namespace HUIFilters.UI.Settings
 {
+    [AutoInstall]
     public class FilterSettingsTab : SettingsModalTabBase
     {
         public event Action SavedFilterSettingsListChanged;
@@ -148,6 +150,14 @@ namespace HUIFilters.UI.Settings
 
             btnAnims = _bottomButton.AddComponent<CustomIconButtonAnimations>();
             btnAnims.HighlightedLocalScale = HighlighedScale;
+
+            SetListData();
+        }
+
+        public void RefreshSavedFilterSettingsList()
+        {
+            if (_parserParams != null)
+                SetListData();
         }
 
         private void SetListData()
@@ -161,12 +171,11 @@ namespace HUIFilters.UI.Settings
 
             _selectedSavedSettings = null;
 
+            NotifyPropertyChanged(nameof(AnyChanges));
             NotifyPropertyChanged(nameof(UpButtonsInteractable));
             NotifyPropertyChanged(nameof(DownButtonsInteractable));
             NotifyPropertyChanged(nameof(DeleteButtonInteractable));
             NotifyPropertyChanged(nameof(DeleteButtonText));
-
-            SetListData();
         }
 
         private void RefreshCellPositions()
@@ -219,8 +228,6 @@ namespace HUIFilters.UI.Settings
 
             foreach (var savedSettingsCell in _savedSettingsListCells.Where(x => !x.Delete))
                 savedSettingsList.Add(savedSettingsCell.SavedSettings);
-
-            SetListData();
 
             this.CallAndHandleAction(SavedFilterSettingsListChanged, nameof(SavedFilterSettingsListChanged));
         }
@@ -329,7 +336,7 @@ namespace HUIFilters.UI.Settings
                     _statusStringBuilder.Clear();
 
                     if (_delete)
-                        _statusStringBuilder.Append("<size=70%><color=#B08060>[Delete]</color></size>  ");
+                        _statusStringBuilder.Append("<size=80%><color=#B08060>[Delete]</color></size>  ");
 
                     if (PluginConfig.Instance.SavedFilterSettings.IndexOf(SavedSettings) == _index)
                     {
