@@ -168,6 +168,7 @@ namespace HUIFilters.UI.Settings
 
             _savedSettingsListTableData.data = _savedSettingsListCells.Select(x => (object)x).ToList();
             _savedSettingsListTableData.tableView.ReloadData();
+            _savedSettingsListTableData.tableView.ClearSelection();
 
             _selectedSavedSettings = null;
 
