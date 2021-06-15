@@ -14,6 +14,7 @@ _**Found a bug or have a suggestion?**_ Please report them [here](https://github
 - Player stats filter allows you to find maps you have never played, maps without a full combo, maps you have scored less than an SS on, etc.
 - Mod requirements filter lets you find maps that utilize mods to create unique experiences
 - PP and Star Rating filters to help with grinding and finding maps of the right difficulty (requires SongDataCore)
+- Save your filter settings with a label for quicker access to your own frequently used settings
 
 ## Dependencies
 
