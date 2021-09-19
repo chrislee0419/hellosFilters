@@ -85,7 +85,7 @@ namespace HUIFilters.UI.Screens
             LevelCollectionNavigationController levelCollectionNC,
             PhysicsRaycasterWithCache physicsRaycaster,
             SettingsModalDispatcher settingsModalDispatcher)
-            : base(mainMenuVC, soloFC, partyFC, levelCollectionNC, physicsRaycaster, new Vector2(52f, 60f), new Vector3(1.15f, 0.1f, 1.85f), Quaternion.Euler(85f, 18f, 0f))
+            : base(mainMenuVC, soloFC, partyFC, levelCollectionNC, physicsRaycaster, new Vector2(52f, 60f), new Vector3(1.1f, 0.1f, 2.3f), Quaternion.Euler(85f, 18f, 0f))
         {
             this._screen.name = "HUISavedFilterSettingsListScreen";
 

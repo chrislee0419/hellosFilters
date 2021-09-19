@@ -142,7 +142,7 @@ namespace HUIFilters.UI.Screens
             GameplaySetupViewController gameplaySetupViewController,
             DiContainer container,
             List<IFilter> filters)
-            : base(mainMenuVC, soloFC, partyFC, levelCollectionNC, physicsRaycaster, new Vector2(100f, 60f), new Vector3(0f, 0.15f, 1.5f), Quaternion.Euler(80f, 0f, 0f))
+            : base(mainMenuVC, soloFC, partyFC, levelCollectionNC, physicsRaycaster, new Vector2(100f, 60f), new Vector3(0f, 0.15f, 1.9f), Quaternion.Euler(80f, 0f, 0f))
         {
             this._screen.name = "HUIFilterSettingsScreen";
 

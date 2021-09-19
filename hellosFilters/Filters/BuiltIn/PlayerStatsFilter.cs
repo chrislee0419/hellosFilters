@@ -372,7 +372,7 @@ namespace HUIFilters.Filters.BuiltIn
                 {
                     var difficultyData = characteristicData.difficultyBeatmaps.FirstOrDefault(x => x.difficulty == difficulty);
                     if (difficultyData != null)
-                        return ScoreModel.MaxRawScoreForNumberOfNotes(difficultyData.beatmapData.cuttableNotesType);
+                        return ScoreModel.MaxRawScoreForNumberOfNotes(difficultyData.beatmapData.cuttableNotesCount);
                 }
             }
 

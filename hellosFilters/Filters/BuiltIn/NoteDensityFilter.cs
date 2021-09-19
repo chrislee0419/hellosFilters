@@ -268,7 +268,7 @@ namespace HUIFilters.Filters.BuiltIn
                 {
                     noteDensities = ostLevel.beatmapLevelData.difficultyBeatmapSets
                         .SelectMany(x => x.difficultyBeatmaps)
-                        .Select(x => x.beatmapData.cuttableNotesType / ostLevel.songDuration);
+                        .Select(x => x.beatmapData.cuttableNotesCount / ostLevel.songDuration);
                 }
                 else
                 {
